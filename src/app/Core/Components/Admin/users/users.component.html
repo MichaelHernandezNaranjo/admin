@@ -1,0 +1,66 @@
+<div class="page-header">
+  <h1>Usuarios</h1>
+  @if (authService.hasPermission('users.create')) {
+    <p-button label="Nuevo Usuario" icon="pi pi-plus" (onClick)="goToNewUser()"></p-button>
+  }
+</div>
+
+<div class="card">
+  <p-table 
+    [value]="users()" 
+    [paginator]="true" 
+    [rows]="pageSize" 
+    [totalRecords]="totalCount()"
+    [loading]="loading()"
+    [lazy]="true" 
+    (onPage)="onPage($event)"
+    [first]="first"
+    [tableStyle]="{'min-width': '60rem'}"
+    styleClass="p-datatable-striped">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+        <th pSortableColumn="firstName">Nombre <p-sortIcon field="firstName"></p-sortIcon></th>
+        <th>Perfil</th>
+        <th>Último Login</th>
+        <th>Estado</th>
+        <th style="width: 8rem">Acciones</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-u>
+      <tr>
+        <td>{{ u.email }}</td>
+        <td>{{ u.firstName }} {{ u.lastName }}</td>
+        <td>{{ u.profiles?.join(', ') || 'Sin perfil' }}</td>
+        <td>{{ u.lastLogin | date:'short' }}</td>
+        <td>
+          <p-tag [value]="u.isActive ? 'Activo' : 'Inactivo'" [severity]="getActiveSeverity(u.isActive)"></p-tag>
+        </td>
+        <td>
+          @if (authService.hasPermission('users.update')) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" (onClick)="goToEditUser(u)"></p-button>
+          }
+          @if (authService.hasPermission('users.delete')) {
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteUser(u)"></p-button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-user" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No hay usuarios registrados</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

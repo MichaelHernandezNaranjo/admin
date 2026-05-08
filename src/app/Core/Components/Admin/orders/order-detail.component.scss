@@ -1,0 +1,192 @@
+$border: var(--p-content-border-color);
+$surface: var(--p-content-background);
+$surface2: var(--p-surface-50);
+$text: var(--p-text-color);
+$muted: var(--p-text-muted-color);
+$primary: var(--p-primary-500);
+$radius: 10px;
+
+.od-loading, .od-empty {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 3rem; color: $muted; font-size: 0.95rem;
+  justify-content: center;
+  a { color: $primary; }
+}
+
+.od-wrapper { display: flex; flex-direction: column; gap: 1.5rem; }
+
+// ─── Header ────────────────────────────────────────────────────────
+.od-header {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 1rem;
+}
+
+.od-header-left {
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+}
+
+.od-order-number { margin: 0; font-size: 1.3rem; font-weight: 800; }
+.od-date { color: $muted; font-size: 0.82rem; }
+
+.od-header-actions {
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+
+// ─── Stepper ───────────────────────────────────────────────────────
+.od-stepper {
+  display: flex; align-items: center; gap: 0;
+  background: $surface; border: 1px solid $border;
+  border-radius: $radius; padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+}
+
+.od-step {
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+  min-width: 80px;
+}
+
+.od-step-circle {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; border: 2px solid $border;
+  transition: all 0.25s;
+}
+
+.od-step-label { font-size: 0.72rem; font-weight: 600; color: $muted; text-align: center; }
+
+.od-step--done {
+  .od-step-circle { background: var(--p-green-500); border-color: var(--p-green-500); color: #fff; }
+  .od-step-label { color: var(--p-green-500); }
+}
+.od-step--active {
+  .od-step-circle { background: $primary; border-color: $primary; color: #fff; }
+  .od-step-label { color: $primary; font-weight: 800; }
+}
+.od-step--pending .od-step-circle { color: $muted; }
+.od-step--cancelled .od-step-circle { color: $muted; opacity: 0.4; }
+
+.od-step-line {
+  flex: 1; height: 2px; background: $border; min-width: 24px;
+  &.od-step-line--done { background: var(--p-green-500); }
+}
+
+.od-cancelled-bar {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+  border-radius: $radius; padding: 0.85rem 1.25rem;
+  color: var(--p-red-500); font-weight: 700; font-size: 0.9rem;
+}
+
+// ─── Body ──────────────────────────────────────────────────────────
+.od-body {
+  display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem;
+  align-items: start;
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+
+.od-col { display: flex; flex-direction: column; gap: 1rem; }
+
+// ─── Card ──────────────────────────────────────────────────────────
+.od-card {
+  background: $surface; border: 1px solid $border;
+  border-radius: $radius; padding: 1.25rem;
+}
+
+.od-card-title {
+  margin: 0 0 1rem; font-size: 0.82rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em; color: $muted;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+
+// ─── Info rows ─────────────────────────────────────────────────────
+.od-info-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.od-info-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 0.75rem; font-size: 0.875rem;
+}
+
+.od-info-label { color: $muted; flex-shrink: 0; }
+
+.od-whatsapp-link {
+  display: flex; align-items: center; gap: 0.35rem;
+  color: #25d366; text-decoration: none; font-weight: 600;
+  &:hover { text-decoration: underline; }
+}
+
+.od-voucher-link {
+  display: flex; align-items: center; gap: 0.35rem;
+  color: $primary; text-decoration: none; font-size: 0.875rem;
+  &:hover { text-decoration: underline; }
+}
+
+.od-payment-badge {
+  font-size: 0.8rem; font-weight: 700; padding: 0.2rem 0.65rem;
+  border-radius: 20px; border: 1px solid $border;
+  &.od-payment-nequi { background: rgba(139,92,246,0.1); color: #7c3aed; border-color: rgba(139,92,246,0.3); }
+  &.od-payment-cod   { background: rgba(34,197,94,0.1);  color: #16a34a; border-color: rgba(34,197,94,0.3);  }
+}
+
+.od-notes { color: $muted; font-size: 0.875rem; line-height: 1.7; margin: 0; white-space: pre-wrap; }
+
+// ─── Items table ───────────────────────────────────────────────────
+.od-items-table {
+  width: 100%; border-collapse: collapse; font-size: 0.875rem;
+
+  th {
+    text-align: left; padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid $border;
+    font-size: 0.75rem; font-weight: 700; color: $muted;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  td {
+    padding: 0.75rem; border-bottom: 1px solid $border; vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+.od-item-name  { font-weight: 600; }
+.od-item-sku   { font-size: 0.75rem; color: $muted; margin-top: 0.2rem; }
+.od-item-attrs { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.35rem; }
+
+.od-attr-chip {
+  font-size: 0.7rem; background: var(--p-surface-100);
+  border: 1px solid $border; border-radius: 12px;
+  padding: 0.15rem 0.5rem; color: $muted;
+}
+
+// ─── Totals ────────────────────────────────────────────────────────
+.od-totals {
+  border-top: 1px solid $border; margin-top: 0.5rem; padding-top: 0.75rem;
+  display: flex; flex-direction: column; gap: 0.4rem;
+}
+
+.od-total-row {
+  display: flex; justify-content: space-between; font-size: 0.875rem;
+  padding: 0.25rem 0;
+}
+
+.od-total-final {
+  border-top: 2px solid $border; margin-top: 0.25rem; padding-top: 0.5rem;
+  font-weight: 800; font-size: 1rem;
+}
+
+.od-discount { color: var(--p-red-500); }
+.od-free     { color: var(--p-green-500); font-weight: 700; }
+
+// ─── Confirm dialog ────────────────────────────────────────────────
+.od-confirm-body { display: flex; flex-direction: column; gap: 1rem;
+  p { margin: 0; font-size: 0.9rem; }
+}
+
+.od-field {
+  display: flex; flex-direction: column; gap: 0.4rem;
+  label { font-size: 0.78rem; font-weight: 600; color: $muted; text-transform: uppercase; letter-spacing: 0.05em; }
+  textarea { width: 100%; resize: vertical; font-family: inherit; }
+}
+
+.od-confirm-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+}

@@ -1,0 +1,589 @@
+@import 'primeicons/primeicons.css';
+
+:root {
+  /* Brand */
+  --p-primary-color: #ef4444;
+  --p-primary-contrast-color: #ffffff;
+  --p-primary-hover-color: #dc2626;
+  --primary-color: #ef4444;
+  --primary-50: rgba(239, 68, 68, 0.08);
+
+  /* Focus ring — rojo en toda la app */
+  --p-focus-ring-color: rgba(239, 68, 68, 0.35);
+  --p-focus-ring-width: 2px;
+  --p-focus-ring-style: solid;
+  --p-focus-ring-offset: 0px;
+
+  /* Surfaces — dark theme */
+  --surface-ground: #0f0f0f;
+  --surface-card: #1a1a1a;
+  --surface-50: #1f1f1f;
+  --surface-100: #222222;
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --surface-hover: rgba(255, 255, 255, 0.06);
+
+  /* Text */
+  --text-color: #f1f5f9;
+  --text-color-secondary: #94a3b8;
+  --text-muted-color: #64748b;
+
+  /* Status */
+  --green-600: #22c55e;
+  --green-100: rgba(34, 197, 94, 0.12);
+  --green-700: #16a34a;
+  --yellow-50: rgba(234, 179, 8, 0.06);
+  --yellow-100: rgba(234, 179, 8, 0.12);
+  --yellow-200: rgba(234, 179, 8, 0.25);
+  --yellow-600: #ca8a04;
+  --yellow-700: #a16207;
+  --yellow-800: #92400e;
+  --red-100: rgba(239, 68, 68, 0.12);
+  --red-500: #ef4444;
+  --red-700: #b91c1c;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--surface-ground);
+  color: var(--text-color);
+}
+
+.p-component {
+  font-family: inherit;
+}
+
+/* PrimeNG dark theme overrides */
+.p-card {
+  background: var(--surface-card) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--surface-border) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+.p-datatable {
+  .p-datatable-thead > tr > th {
+    background: var(--surface-100) !important;
+    color: var(--text-color-secondary) !important;
+    border-color: var(--surface-border) !important;
+  }
+  .p-datatable-tbody > tr {
+    background: var(--surface-card) !important;
+    color: var(--text-color) !important;
+    border-color: var(--surface-border) !important;
+    &:hover {
+      background: var(--surface-hover) !important;
+    }
+  }
+  .p-datatable-tfoot > tr > td {
+    background: var(--surface-100) !important;
+    border-color: var(--surface-border) !important;
+  }
+}
+
+// ===== INPUTS / SELECT / AUTOCOMPLETE =====
+.p-inputtext, .p-dropdown, .p-multiselect, .p-autocomplete .p-autocomplete-input,
+.p-inputnumber-input, .p-textarea {
+  background: var(--surface-100) !important;
+  color: var(--text-color) !important;
+  border-color: var(--surface-border) !important;
+  &:focus, &.p-focus {
+    border-color: var(--p-primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+  }
+  &::placeholder { color: var(--text-muted-color) !important; }
+}
+
+// InputGroup addon (icono de búsqueda, etc.)
+.p-inputgroup-addon {
+  background: var(--surface-100) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--text-color-secondary) !important;
+}
+
+// InputNumber horizontal buttons (+ / -)
+.p-inputnumber-button {
+  background: var(--surface-100) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--text-color) !important;
+  &:hover {
+    background: var(--surface-200) !important;
+    border-color: var(--surface-border) !important;
+  }
+}
+
+// PrimeNG 21 — p-select component
+.p-select {
+  background: var(--surface-100) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--text-color) !important;
+
+  &:hover { border-color: rgba(239, 68, 68, 0.5) !important; }
+
+  &.p-focus {
+    border-color: var(--p-primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+  }
+
+  .p-select-label {
+    color: var(--text-color) !important;
+    background: transparent !important;
+
+    &.p-placeholder { color: var(--text-muted-color) !important; }
+  }
+
+  .p-select-dropdown {
+    color: var(--text-muted-color) !important;
+    background: transparent !important;
+  }
+
+  .p-select-clear-icon { color: var(--text-muted-color) !important; }
+}
+
+// PrimeNG 21 — p-select panel/overlay
+.p-select-overlay {
+  background: #1f1f1f !important;
+  border: 1px solid var(--surface-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+
+  .p-select-filter-container {
+    padding: 0.5rem !important;
+    border-bottom: 1px solid var(--surface-border) !important;
+
+    .p-select-filter {
+      background: var(--surface-100) !important;
+      color: var(--text-color) !important;
+      border-color: var(--surface-border) !important;
+      width: 100% !important;
+
+      &:focus {
+        border-color: var(--p-primary-color) !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+      }
+    }
+  }
+
+  .p-select-list-container .p-select-list {
+    padding: 0.25rem !important;
+  }
+
+  .p-select-option {
+    color: var(--text-color) !important;
+    border-radius: 4px !important;
+
+    &:hover,
+    &.p-select-option-selected {
+      background: rgba(239, 68, 68, 0.12) !important;
+      color: #fff !important;
+    }
+
+    &.p-focus {
+      background: rgba(239, 68, 68, 0.08) !important;
+    }
+  }
+
+  .p-select-empty-message {
+    color: var(--text-muted-color) !important;
+    padding: 0.75rem 1rem !important;
+  }
+}
+
+// PrimeNG 21 — p-autocomplete panel
+.p-autocomplete-overlay {
+  background: #1f1f1f !important;
+  border: 1px solid var(--surface-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+
+  .p-autocomplete-option {
+    color: var(--text-color) !important;
+    border-radius: 4px !important;
+
+    &:hover,
+    &.p-autocomplete-option-selected,
+    &.p-focus {
+      background: rgba(239, 68, 68, 0.12) !important;
+      color: #fff !important;
+    }
+  }
+
+  .p-autocomplete-empty-message {
+    color: var(--text-muted-color) !important;
+    padding: 0.75rem 1rem !important;
+  }
+}
+
+// PrimeNG 21 — p-autocomplete input chip tags
+.p-autocomplete {
+  .p-autocomplete-input-multiple {
+    background: var(--surface-100) !important;
+    border-color: var(--surface-border) !important;
+    color: var(--text-color) !important;
+
+    &:hover { border-color: rgba(239, 68, 68, 0.5) !important; }
+    &.p-focus {
+      border-color: var(--p-primary-color) !important;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+    }
+
+    .p-autocomplete-chip-item .p-chip {
+      background: rgba(239, 68, 68, 0.15) !important;
+      color: #fca5a5 !important;
+      border: 1px solid rgba(239, 68, 68, 0.3) !important;
+
+      .p-chip-remove-icon { color: #fca5a5 !important; }
+    }
+
+    .p-autocomplete-input {
+      background: transparent !important;
+      color: var(--text-color) !important;
+      &::placeholder { color: var(--text-muted-color) !important; }
+    }
+  }
+}
+
+// Legacy panel selectors (kept for backwards compat)
+.p-dropdown-panel, .p-autocomplete-panel, .p-multiselect-panel, .p-overlaypanel {
+  background: #1f1f1f !important;
+  border: 1px solid var(--surface-border) !important;
+  .p-dropdown-item, .p-autocomplete-item, .p-multiselect-item {
+    color: var(--text-color) !important;
+    &:hover, &.p-highlight {
+      background: rgba(239, 68, 68, 0.12) !important;
+      color: var(--text-color) !important;
+    }
+  }
+  .p-dropdown-filter-container .p-dropdown-filter {
+    background: var(--surface-100) !important;
+    color: var(--text-color) !important;
+    border-color: var(--surface-border) !important;
+  }
+}
+
+.p-dialog {
+  background: var(--surface-card) !important;
+  border: 1px solid var(--surface-border) !important;
+  .p-dialog-header {
+    background: var(--surface-card) !important;
+    color: var(--text-color) !important;
+    border-bottom: 1px solid var(--surface-border) !important;
+  }
+  .p-dialog-content {
+    background: var(--surface-card) !important;
+    color: var(--text-color) !important;
+  }
+  .p-dialog-footer {
+    background: var(--surface-card) !important;
+    border-top: 1px solid var(--surface-border) !important;
+  }
+}
+
+.p-paginator {
+  background: var(--surface-card) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--text-color) !important;
+  .p-paginator-page, .p-paginator-first, .p-paginator-prev, .p-paginator-next, .p-paginator-last {
+    color: var(--text-color) !important;
+    &:hover { background: var(--surface-hover) !important; }
+    &.p-highlight { background: var(--p-primary-color) !important; color: #fff !important; }
+  }
+}
+
+/* Forzar rojo como color primario en TODOS los botones PrimeNG por defecto */
+:root {
+  --p-button-primary-background: #ef4444;
+  --p-button-primary-hover-background: #dc2626;
+  --p-button-primary-active-background: #b91c1c;
+  --p-button-primary-border-color: #ef4444;
+  --p-button-primary-hover-border-color: #dc2626;
+  --p-button-primary-active-border-color: #b91c1c;
+  --p-button-primary-color: #ffffff;
+  --p-button-primary-hover-color: #ffffff;
+  --p-button-primary-active-color: #ffffff;
+}
+
+.p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-secondary):not(.p-button-warning):not(.p-button-info):not(.p-button-danger):not(.p-button-success):not(.p-button-contrast) {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  &:hover {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+  }
+  &:active {
+    background: #b91c1c !important;
+    border-color: #b91c1c !important;
+  }
+}
+
+.p-button.p-button-outlined {
+  background: transparent !important;
+  color: var(--text-color) !important;
+  border-color: var(--surface-border) !important;
+  &:hover { background: var(--surface-hover) !important; }
+}
+
+.p-button.p-button-text {
+  background: transparent !important;
+  color: var(--text-color) !important;
+  &:hover { background: var(--surface-hover) !important; }
+}
+
+.p-button.p-button-secondary {
+  background: var(--surface-100) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--text-color) !important;
+  &:hover { background: var(--surface-hover) !important; }
+}
+
+.p-button.p-button-danger {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  &:hover { background: #dc2626 !important; border-color: #dc2626 !important; }
+}
+
+.p-tabs, .p-tablist, .p-tabpanels {
+  background: transparent !important;
+}
+.p-tab {
+  color: var(--text-color-secondary) !important;
+  border-color: transparent !important;
+  &.p-tab-active {
+    color: #ef4444 !important;
+    border-color: #ef4444 !important;
+  }
+  &:hover { color: var(--text-color) !important; }
+}
+
+// PrimeNG 21 internal token overrides for tabs
+:root {
+  --p-tabs-tab-active-color: #ef4444 !important;
+  --p-tabs-tab-active-border-color: #ef4444 !important;
+  --p-tabs-active-bar-background: #ef4444 !important;
+  --p-tabs-tab-color: var(--text-color-secondary);
+  --p-tabs-tab-hover-color: var(--text-color);
+  --p-tabs-nav-background: transparent;
+  --p-tabs-content-background: transparent;
+}
+
+.p-tag {
+  &.p-tag-success { background: rgba(34, 197, 94, 0.15) !important; color: #4ade80 !important; }
+  &.p-tag-warning { background: rgba(234, 179, 8, 0.15) !important; color: #fbbf24 !important; }
+  &.p-tag-danger  { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+  &.p-tag-info    { background: rgba(59, 130, 246, 0.15) !important; color: #60a5fa !important; }
+}
+
+.p-message {
+  &.p-message-error { background: rgba(239, 68, 68, 0.12) !important; border-color: rgba(239, 68, 68, 0.3) !important; }
+  .p-message-text { color: var(--text-color) !important; }
+}
+
+.p-avatar {
+  background: var(--p-primary-color) !important;
+  color: #fff !important;
+}
+
+.p-virtualscroller { background: transparent !important; }
+.p-checkbox .p-checkbox-box.p-highlight { background: var(--p-primary-color) !important; border-color: var(--p-primary-color) !important; }
+.p-radiobutton .p-radiobutton-box.p-highlight { border-color: var(--p-primary-color) !important; .p-radiobutton-icon { background: var(--p-primary-color) !important; } }
+
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  padding: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: var(--text-muted-color);
+}
+
+.text-primary {
+  color: var(--p-primary-color);
+}
+
+.text-red-500 {
+  color: #dc2626;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.pl-4 {
+  padding-left: 1rem;
+}
+
+.ms-2 {
+  margin-left: 0.5rem;
+}
+
+.ms-auto {
+  margin-left: auto;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.relative {
+  position: relative;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.border-0 {
+  border: none !important;
+}
+
+.border {
+  border-width: 1px;
+  border-style: solid;
+}
+
+.border-surface {
+  border-color: var(--surface-border);
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.rounded-none {
+  border-radius: 0;
+}
+
+.bg-transparent {
+  background: transparent;
+}
+
+.bg-surface-100 {
+  background: var(--surface-hover);
+}
+
+.bg-emphasis {
+  background: var(--surface-hover);
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.block {
+  display: block;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.transition-colors {
+  transition-property: color, background-color, border-color;
+  transition-duration: 0.2s;
+}
+
+.duration-200 {
+  transition-duration: 0.2s;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

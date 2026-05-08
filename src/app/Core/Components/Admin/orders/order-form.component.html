@@ -1,0 +1,235 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingOrder() ? 'Editar' : 'Nuevo' }} Pedido</h1>
+  </div>
+</div>
+
+<div class="card form-card">
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="customer">Cliente *</label>
+      <p-select 
+        [(ngModel)]="formData.customerId" 
+        [options]="customers()" 
+        optionLabel="name" 
+        optionValue="id"
+        placeholder="Seleccionar cliente"
+        [filter]="true"
+        filterBy="name,email"
+        styleClass="w-full">
+        <ng-template pTemplate="item" let-customer>
+          {{ customer.name }} ({{ customer.email }})
+        </ng-template>
+      </p-select>
+    </div>
+
+    <div class="form-field">
+      <label for="warehouse">Almacén</label>
+      <p-select 
+        [(ngModel)]="formData.warehouseId" 
+        [options]="warehouses()" 
+        optionLabel="name" 
+        optionValue="id"
+        placeholder="Seleccionar almacén"
+        styleClass="w-full">
+      </p-select>
+    </div>
+
+    <div class="form-field">
+      <label for="priceList">Lista de Precios</label>
+      <p-select 
+        [(ngModel)]="formData.priceListId" 
+        [options]="priceLists()" 
+        optionLabel="name" 
+        optionValue="id"
+        placeholder="Precio estándar (opcional)"
+        [filter]="true"
+        filterBy="name"
+        [showClear]="true"
+        (ngModelChange)="onPriceListChange($event)"
+        styleClass="w-full">
+      </p-select>
+    </div>
+
+    <div class="form-field">
+      <label for="couponCode">Código de cupón <span style="font-weight:400;color:#888;font-size:0.8rem">(opcional)</span></label>
+      <input pInputText id="couponCode" [(ngModel)]="formData.couponCode"
+        placeholder="Ej: VERANO25" class="w-full" style="text-transform:uppercase" />
+    </div>
+
+    <div class="form-field full-width">
+      <label for="notes">Notas</label>
+      <textarea 
+        pInputTextarea 
+        id="notes" 
+        [(ngModel)]="formData.notes" 
+        [rows]="3"
+        placeholder="Notas del pedido"
+        class="w-full"
+      ></textarea>
+    </div>
+  </div>
+
+  @if (!editingOrder()) {
+    <div class="items-section">
+      <div class="section-header">
+        <i class="pi pi-shopping-cart"></i>
+        <h3>Agregar Productos</h3>
+      </div>
+      
+      <div class="add-item-card">
+        <div class="add-item-row">
+          <div class="search-field">
+            <label>Producto / Referencia</label>
+            <p-autocomplete 
+              [(ngModel)]="selectedReference" 
+              [suggestions]="filteredReferences"
+              (completeMethod)="searchReferences($event)"
+              placeholder="Nombre, código o SKU..."
+              [showClear]="true"
+              optionLabel="displayLabel"
+              dataKey="id"
+              styleClass="w-full"
+              inputStyleClass="w-full">
+              <ng-template pTemplate="item" let-ref>
+                <div class="reference-item">
+                  <div class="reference-main" style="pointer-events:none">
+                    <span class="product-name">{{ ref.productName }}</span>
+                    <span class="reference-code">{{ ref.referenceCode }}</span>
+                  </div>
+                  <div class="reference-details" style="pointer-events:none">
+                    @if (ref.attributeValues && ref.attributeValues.length > 0) {
+                      <span class="attributes">
+                        <i class="pi pi-tag"></i>
+                        {{ getAttributeDisplay(ref) }}
+                      </span>
+                    }
+                    <span class="price">{{ ref.price | currency:'MXN' }}</span>
+                  </div>
+                </div>
+              </ng-template>
+            </p-autocomplete>
+          </div>
+
+          <div class="qty-field">
+            <label>Cant.</label>
+            <p-inputNumber 
+              [(ngModel)]="selectedQuantity" 
+              [min]="1"
+              [showButtons]="true"
+              buttonLayout="horizontal"
+              incrementButtonIcon="pi pi-plus"
+              decrementButtonIcon="pi pi-minus"
+              styleClass="qty-input">
+            </p-inputNumber>
+          </div>
+
+          <div class="add-btn-field">
+            <p-button 
+              label="Agregar" 
+              icon="pi pi-plus-circle" 
+              (onClick)="addItem()"
+              severity="secondary"
+              [outlined]="true"
+              [loading]="addingItem()"
+              styleClass="w-full">
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (formData.items.length > 0) {
+    <div class="items-table">
+      <p-table [value]="formData.items" [tableStyle]="{ 'min-width': '40rem' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Producto</th>
+            <th>SKU/Referencia</th>
+            <th>Atributos</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Descuento</th>
+            <th>Total</th>
+            @if (!editingOrder()) {
+              <th>Acciones</th>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-i="rowIndex">
+          <tr>
+            <td>{{ item.productName }}</td>
+            <td>{{ item.referenceCode }}</td>
+            <td>
+              @if (item.attributeDisplay) {
+                <span class="text-sm text-gray-600">{{ item.attributeDisplay }}</span>
+              } @else {
+                <span class="text-sm text-gray-400">-</span>
+              }
+            </td>
+            <td>{{ item.quantity }}</td>
+            <td>
+              @if (item.discount > 0) {
+                <span class="price-original">{{ item.unitPrice | currency:'COP' }}</span>
+                <span class="price-discounted">{{ item.discountedUnitPrice | currency:'COP' }}</span>
+              } @else {
+                {{ item.unitPrice | currency:'COP' }}
+              }
+            </td>
+            <td>
+              @if (item.discount > 0) {
+                <span class="discount-cell">
+                  -{{ item.discount | currency:'COP' }}
+                  @if (item.discountName) {
+                    <br><small>{{ item.discountName }}</small>
+                  }
+                </span>
+              } @else {
+                <span style="color:#555">—</span>
+              }
+            </td>
+            <td>{{ item.total | currency:'COP' }}</td>
+            @if (!editingOrder()) {
+              <td>
+                <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="removeItem(i)"></p-button>
+              </td>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="6" class="text-right"><strong>Subtotal:</strong></td>
+            <td>{{ getSubtotal() | currency:'COP' }}</td>
+            @if (!editingOrder()) { <td></td> }
+          </tr>
+          @if (getDiscountTotal() > 0) {
+            <tr>
+              <td colspan="6" class="text-right" style="color:#ef4444"><strong>Descuentos:</strong></td>
+              <td style="color:#ef4444">-{{ getDiscountTotal() | currency:'COP' }}</td>
+              @if (!editingOrder()) { <td></td> }
+            </tr>
+          }
+          <tr>
+            <td colspan="6" class="text-right"><strong>IVA (16%):</strong></td>
+            <td>{{ getTaxAmount() | currency:'COP' }}</td>
+            @if (!editingOrder()) { <td></td> }
+          </tr>
+          <tr>
+            <td colspan="6" class="text-right"><strong>Total:</strong></td>
+            <td><strong>{{ getTotal() | currency:'COP' }}</strong></td>
+            @if (!editingOrder()) { <td></td> }
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+
+  <div class="form-actions">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" [loading]="isLoading()" (onClick)="saveOrder()"></p-button>
+  </div>
+</div>
+
+<p-toast></p-toast>

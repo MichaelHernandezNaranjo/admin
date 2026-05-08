@@ -1,0 +1,215 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingProduct() ? 'Editar' : 'Nuevo' }} Producto</h1>
+  </div>
+</div>
+
+<div class="card">
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Datos Generales</p-tab>
+      @if (editingProduct()) {
+        <p-tab value="1">Referencias de Producto</p-tab>
+      }
+    </p-tablist>
+    <p-tabpanels>
+      <p-tabpanel value="0">
+        <div class="form-card">
+          <div class="form-grid">
+
+            <div class="form-field">
+              <label for="productCode">Código</label>
+              <input pInputText id="productCode" [(ngModel)]="formData.productCode"
+                [disabled]="!!editingProduct()" placeholder="Código del producto" class="w-full" />
+            </div>
+
+            <div class="form-field">
+              <label for="name">Nombre</label>
+              <input pInputText id="name" [(ngModel)]="formData.name"
+                placeholder="Nombre del producto" class="w-full" />
+            </div>
+
+            <div class="form-field full-width">
+              <label for="description">Descripción</label>
+              <textarea pInputTextarea id="description" [(ngModel)]="formData.description"
+                [rows]="3" placeholder="Descripción del producto" class="w-full"></textarea>
+            </div>
+
+            <div class="form-field">
+              <label for="categoryId">Categoría</label>
+              <p-select [options]="categories" [(ngModel)]="formData.categoryId"
+                optionLabel="label" optionValue="value" placeholder="Seleccionar categoría"
+                [showClear]="true" class="w-full"></p-select>
+            </div>
+
+            <div class="form-field">
+              <label for="brandId">Marca</label>
+              <p-select [options]="brands" [(ngModel)]="formData.brandId"
+                optionLabel="label" optionValue="value" placeholder="Seleccionar marca"
+                [showClear]="true" class="w-full"></p-select>
+            </div>
+
+            <div class="form-field">
+              <label for="isActive">Activo</label>
+              <p-checkbox [(ngModel)]="formData.isActive" [binary]="true" inputId="isActive"></p-checkbox>
+            </div>
+
+            <div class="form-field full-width">
+              <label>Tags</label>
+              <p-autocomplete
+                [(ngModel)]="selectedTags"
+                [suggestions]="tagSuggestions"
+                (completeMethod)="searchTags($event)"
+                [multiple]="true"
+                [forceSelection]="false"
+                placeholder="Escribe un tag y presiona Enter..."
+                styleClass="w-full"
+                inputStyleClass="w-full">
+              </p-autocomplete>
+            </div>
+
+            <!-- ── GALERÍA DE IMÁGENES ──────────────────────────────────── -->
+            <div class="form-field full-width">
+              <label>Imágenes del producto</label>
+              <div class="image-upload-area">
+
+                @if (productImages.length > 0) {
+                  <div class="image-gallery">
+                    @for (img of productImages; track img.url; let i = $index) {
+                      <div class="gallery-item" [class.gallery-item--main]="i === 0">
+
+                        <img [src]="getImageUrl(img.url)" [alt]="'Imagen ' + (i + 1)" class="gallery-img" />
+
+                        <!-- Badge principal -->
+                        @if (i === 0) {
+                          <span class="gallery-badge">Principal</span>
+                        }
+
+                        <!-- Overlay de acciones -->
+                        <div class="gallery-item-overlay">
+                          @if (i !== 0) {
+                            <p-button icon="pi pi-star" [text]="true" [rounded]="true"
+                              severity="warn" pTooltip="Hacer principal"
+                              (onClick)="setMainImage(i)">
+                            </p-button>
+                          }
+                          <p-button icon="pi pi-tag" [text]="true" [rounded]="true"
+                            pTooltip="Editar atributos"
+                            (onClick)="openAttributeDialog(i)">
+                          </p-button>
+                          <p-button icon="pi pi-trash" [text]="true" [rounded]="true"
+                            severity="danger" pTooltip="Eliminar"
+                            (onClick)="removeImage(i)">
+                          </p-button>
+                        </div>
+
+                        <!-- Chips de atributos -->
+                        @if (img.attributes.length > 0) {
+                          <div class="gallery-chips">
+                            @for (attr of img.attributes; track attr.definitionId) {
+                              <span class="attr-chip">
+                                <span class="attr-chip-label">{{ attr.definitionName }}</span>
+                                <span class="attr-chip-value">{{ attr.optionValue }}</span>
+                              </span>
+                            }
+                          </div>
+                        }
+
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Upload -->
+                <div class="upload-controls">
+                  <p-fileupload
+                    mode="basic"
+                    name="images"
+                    accept="image/*"
+                    [maxFileSize]="5242880"
+                    [multiple]="true"
+                    chooseLabel="Agregar imágenes"
+                    chooseIcon="pi pi-upload"
+                    [auto]="true"
+                    [customUpload]="true"
+                    (uploadHandler)="onImagesSelected($event)"
+                    [disabled]="isUploading()"
+                    styleClass="image-uploader">
+                  </p-fileupload>
+                  @if (isUploading()) {
+                    <span class="upload-hint"><i class="pi pi-spin pi-spinner"></i> Subiendo...</span>
+                  } @else {
+                    <span class="upload-hint">JPG, PNG, WEBP — máx. 5 MB por imagen. La primera imagen es la principal.</span>
+                  }
+                </div>
+
+              </div>
+            </div>
+            <!-- ── FIN GALERÍA ──────────────────────────────────────────── -->
+
+          </div>
+
+          <div class="form-actions">
+            <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+            <p-button label="Guardar" icon="pi pi-check" [loading]="isLoading()" [disabled]="isUploading()" (onClick)="saveProduct()"></p-button>
+          </div>
+        </div>
+      </p-tabpanel>
+
+      @if (editingProduct()) {
+        <p-tabpanel value="1">
+          <app-product-references
+            [productId]="editingProduct()!.id"
+            [categoryId]="editingProduct()!.categoryId || undefined">
+          </app-product-references>
+        </p-tabpanel>
+      }
+    </p-tabpanels>
+  </p-tabs>
+</div>
+
+<!-- ── DIALOG: ATRIBUTOS DE IMAGEN ────────────────────────────────────────── -->
+<p-dialog
+  header="Atributos de imagen"
+  [(visible)]="showAttributeDialog"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+  (onHide)="closeAttributeDialog()">
+
+  <div class="attr-dialog-body">
+
+    @if (imageAttributeDefs.length === 0) {
+      <p class="attr-dialog-empty">
+        Este producto no tiene atributos disponibles.<br>
+        Asigná una categoría con atributos definidos.
+      </p>
+    } @else {
+      <p class="attr-dialog-hint">Seleccioná los atributos que describen esta imagen. Todos son opcionales.</p>
+
+      @for (def of imageAttributeDefs; track def.definitionId) {
+        <div class="attr-dialog-row">
+          <label class="attr-dialog-label">{{ def.name }}</label>
+          <p-select
+            [options]="getAttributeOptions(def.definitionId)"
+            [(ngModel)]="selectedAttributeValues[def.definitionId]"
+            optionLabel="label"
+            optionValue="value"
+            [placeholder]="'Sin ' + def.name"
+            [showClear]="true"
+            class="w-full">
+          </p-select>
+        </div>
+      }
+    }
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="closeAttributeDialog()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" (onClick)="saveImageAttributes()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>

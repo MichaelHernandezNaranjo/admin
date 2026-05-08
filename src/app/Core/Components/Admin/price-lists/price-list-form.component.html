@@ -1,0 +1,179 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingPriceList() ? 'Editar' : 'Nueva' }} Lista de Precios</h1>
+  </div>
+</div>
+
+<div class="card form-card">
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Información General</p-tab>
+      <p-tab value="1" [disabled]="!editingPriceList()">Productos</p-tab>
+    </p-tablist>
+    
+    <p-tabpanels>
+      <!-- Tab: Información General -->
+      <p-tabpanel value="0">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="name">Nombre *</label>
+            <input 
+              pInputText 
+              id="name" 
+              [(ngModel)]="formData.name" 
+              placeholder="Nombre de la lista"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="description">Descripción</label>
+            <textarea 
+              pInputTextarea 
+              id="description" 
+              [(ngModel)]="formData.description" 
+              [rows]="3"
+              placeholder="Descripción"
+              class="w-full"
+            ></textarea>
+          </div>
+
+          <div class="form-field checkbox-field">
+            <p-checkbox [(ngModel)]="formData.isDefault" [binary]="true" inputId="isDefault"></p-checkbox>
+            <label for="isDefault">Por Defecto</label>
+          </div>
+
+          <div class="form-field checkbox-field">
+            <p-checkbox [(ngModel)]="formData.isActive" [binary]="true" inputId="isActive"></p-checkbox>
+            <label for="isActive">Activo</label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+          <p-button label="Guardar" icon="pi pi-check" [loading]="isLoading()" (onClick)="savePriceList()"></p-button>
+        </div>
+      </p-tabpanel>
+
+      <!-- Tab: Productos -->
+      <p-tabpanel value="1">
+        <div class="products-section">
+          <div class="section-header">
+            <h3>Referencias en esta Lista de Precios</h3>
+            <p-button 
+              label="Agregar Referencia" 
+              icon="pi pi-plus" 
+              (onClick)="openAddProductDialog()"
+              severity="success">
+            </p-button>
+          </div>
+
+          <p-table [value]="priceListProducts()" [tableStyle]="{ 'min-width': '50rem' }">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Producto</th>
+                <th>SKU/Referencia</th>
+                <th>Atributos</th>
+                <th>Precio Base</th>
+                <th>Precio en Lista</th>
+                <th>Acciones</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+              <tr>
+                <td>{{ item.productName }}</td>
+                <td>
+                  <span class="reference-code">{{ item.referenceCode || 'N/A' }}</span>
+                </td>
+                <td>
+                  @if (item.attributeValues && item.attributeValues.length > 0) {
+                    <span class="attributes-text">{{ getAttributeDisplay(item) }}</span>
+                  } @else {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+                <td>{{ item.basePrice | currency:'MXN' }}</td>
+                <td><strong>{{ item.price | currency:'MXN' }}</strong></td>
+                <td>
+                  <p-button 
+                    icon="pi pi-trash" 
+                    [text]="true" 
+                    severity="danger"
+                   (onClick)="removeProductFromPriceList(item.id)">
+                  </p-button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="6" class="text-center">No hay referencias agregadas</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>
+
+<!-- Dialog: Agregar Referencia -->
+<p-dialog 
+  [(visible)]="showProductDialog" 
+  header="Agregar Referencia a Lista de Precios" 
+  [modal]="true" 
+  [style]="{ width: '600px' }">
+  <div class="dialog-content">
+    <div class="form-field">
+      <label for="reference">Buscar Referencia *</label>
+      <p-autocomplete 
+        [(ngModel)]="selectedReference" 
+        [suggestions]="filteredReferences"
+        (completeMethod)="searchReferences($event)"
+        placeholder="Escribe el nombre del producto, código o SKU..."
+        [showClear]="true"
+        optionLabel="displayLabel"
+        dataKey="id"
+        styleClass="w-full"
+        inputStyleClass="w-full">
+        <ng-template pTemplate="item" let-ref>
+          <div class="reference-item">
+            <div class="reference-main" style="pointer-events:none">
+              <span class="product-name">{{ ref.productName }}</span>
+              <span class="reference-code">{{ ref.referenceCode }}</span>
+            </div>
+            <div class="reference-details" style="pointer-events:none">
+              @if (ref.attributeValues && ref.attributeValues.length > 0) {
+                <span class="attributes">
+                  <i class="pi pi-tag"></i>
+                  {{ getAttributeDisplay(ref) }}
+                </span>
+              }
+              <span class="price">{{ ref.price | currency:'MXN' }}</span>
+            </div>
+          </div>
+        </ng-template>
+      </p-autocomplete>
+    </div>
+
+    <div class="form-field">
+      <label for="price">Precio en Lista *</label>
+      <p-inputNumber 
+        [(ngModel)]="newProductPrice" 
+        mode="currency" 
+        currency="MXN" 
+        locale="es-MX"
+        [min]="0"
+        placeholder="Precio"
+        styleClass="w-full">
+      </p-inputNumber>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="showProductDialog = false"></p-button>
+    <p-button label="Agregar" icon="pi pi-check" (onClick)="addProductToPriceList()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>

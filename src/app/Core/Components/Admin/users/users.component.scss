@@ -1,0 +1,12 @@
+.empty-state {
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  p {
+    color: var(--text-muted-color);
+    margin: 0;
+  }
+}

@@ -1,0 +1,106 @@
+<p-toolbar>
+  <ng-template pTemplate="start">
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <h2 style="margin:0">Pedidos</h2>
+      @if (pendingCount() > 0) {
+        <span style="background:var(--p-orange-500);color:#fff;font-size:0.72rem;font-weight:800;
+                     padding:0.2rem 0.65rem;border-radius:12px;letter-spacing:0.04em">
+          {{ pendingCount() }} pendiente{{ pendingCount() === 1 ? '' : 's' }}
+        </span>
+      }
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <p-button label="Nuevo Pedido" icon="pi pi-plus" (onClick)="goToNewOrder()"></p-button>
+  </ng-template>
+</p-toolbar>
+
+<div class="card">
+  <div class="filters-row">
+    <p-inputGroup class="search-input">
+      <p-inputGroupAddon>
+        <i class="pi pi-search"></i>
+      </p-inputGroupAddon>
+      <input 
+        pInputText 
+        [(ngModel)]="searchTerm" 
+        (keyup.enter)="onSearch()"
+        placeholder="Buscar por número o cliente..." />
+    </p-inputGroup>
+    
+    <p-select 
+      [(ngModel)]="selectedStatus" 
+      [options]="statusOptions" 
+      optionLabel="label" 
+      optionValue="value"
+      (ngModelChange)="loadOrders()"
+      placeholder="Filtrar por estado"
+      [showClear]="true"
+      styleClass="status-select">
+    </p-select>
+  </div>
+
+  <p-table 
+    [value]="orders()" 
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [first]="first"
+    (onPage)="onPageChange($event)"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    [rowHover]="true">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="orderNumber">Número <p-sortIcon field="orderNumber"></p-sortIcon></th>
+        <th pSortableColumn="orderDate">Fecha <p-sortIcon field="orderDate"></p-sortIcon></th>
+        <th>Cliente</th>
+        <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
+        <th pSortableColumn="total" style="text-align:right">Total <p-sortIcon field="total"></p-sortIcon></th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-order>
+      <tr (click)="viewOrder(order)" style="cursor:pointer">
+        <td><strong>{{ order.orderNumber }}</strong></td>
+        <td>{{ order.orderDate | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>
+          <div>{{ order.customerName }}</div>
+          <small class="text-muted">{{ order.customerEmail }}</small>
+        </td>
+        <td>
+          <p-tag [value]="getStatusLabel(order.status)" [severity]="getStatusSeverity(order.status)"></p-tag>
+        </td>
+        <td style="text-align:right">{{ order.total | currency:'COP':'symbol':'1.0-0' }}</td>
+        <td (click)="$event.stopPropagation()">
+          <p-button 
+            icon="pi pi-eye" 
+            [text]="true" 
+            (onClick)="viewOrder(order)"
+            pTooltip="Ver detalles">
+          </p-button>
+          <p-button 
+            icon="pi pi-trash" 
+            [text]="true" 
+            severity="danger"
+            (onClick)="deleteOrder(order)"
+            [disabled]="order.status !== 0"
+            pTooltip="Eliminar">
+          </p-button>
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center">No se encontraron pedidos</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>

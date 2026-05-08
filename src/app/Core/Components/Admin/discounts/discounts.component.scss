@@ -1,0 +1,50 @@
+.discount-name {
+  display: block;
+  font-weight: 500;
+}
+
+.discount-desc {
+  display: block;
+  font-size: 0.78rem;
+  color: #888;
+  margin-top: 2px;
+}
+
+.scope-all {
+  color: #86efac;
+  font-size: 0.88rem;
+  i { margin-right: 4px; }
+}
+
+.scope-partial {
+  font-size: 0.88rem;
+  color: #93c5fd;
+}
+
+.coupon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #2d1f3d;
+  color: #d8b4fe;
+  border: 1px solid #7c3aed44;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.82rem;
+  font-family: monospace;
+  letter-spacing: 0.5px;
+}
+
+.auto-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #fbbf24;
+  font-size: 0.82rem;
+}
+
+.date-range {
+  font-size: 0.85rem;
+  color: #aaa;
+  white-space: nowrap;
+}

@@ -1,0 +1,87 @@
+<div class="page-header">
+  <h1>Marcas</h1>
+  @if (authService.hasPermission('products.create')) {
+    <p-button label="Nueva Marca" icon="pi pi-plus" (onClick)="goToNewBrand()"></p-button>
+  }
+</div>
+
+<div class="card">
+  <div class="table-header">
+    <p-inputgroup>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Buscar marcas..."
+      />
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-search" [text]="true" severity="secondary" />
+      </p-inputgroup-addon>
+    </p-inputgroup>
+  </div>
+
+  <p-table
+    [value]="brands()"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [lazy]="true"
+    (onSort)="onSort($event)"
+    [first]="first"
+    [tableStyle]="{'min-width': '50rem'}"
+    styleClass="p-datatable-striped">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 5rem">Logo</th>
+        <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon></th>
+        <th>Descripción</th>
+        <th pSortableColumn="isActive">Estado <p-sortIcon field="isActive"></p-sortIcon></th>
+        <th style="width: 8rem">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-brand>
+      <tr>
+        <td>
+          @if (brand.logoUrl) {
+            <img [src]="getLogoUrl(brand.logoUrl)" [alt]="brand.name" class="brand-logo-thumb" />
+          } @else {
+            <div class="brand-logo-placeholder">
+              <i class="pi pi-image"></i>
+            </div>
+          }
+        </td>
+        <td class="font-semibold">{{ brand.name }}</td>
+        <td>{{ brand.description || '-' }}</td>
+        <td>
+          <p-tag [value]="brand.isActive ? 'Activo' : 'Inactivo'" [severity]="getSeverity(brand.isActive)"></p-tag>
+        </td>
+        <td>
+          @if (authService.hasPermission('products.update')) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" (onClick)="goToEditBrand(brand)"></p-button>
+          }
+          @if (authService.hasPermission('products.delete')) {
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteBrand(brand)"></p-button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No hay marcas registradas</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

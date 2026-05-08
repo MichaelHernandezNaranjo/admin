@@ -1,0 +1,66 @@
+<div class="page-header">
+  <h1>Impuestos</h1>
+  @if (authService.hasPermission('taxes.create')) {
+    <p-button label="Nuevo Impuesto" icon="pi pi-plus" (onClick)="goToNewTax()"></p-button>
+  }
+</div>
+
+<div class="card">
+  <p-table 
+    [value]="taxes()" 
+    [paginator]="true" 
+    [rows]="pageSize" 
+    [totalRecords]="totalCount()"
+    [loading]="loading()"
+    [lazy]="true" 
+    (onPage)="onPage($event)"
+    [first]="first"
+    [tableStyle]="{'min-width': '40rem'}"
+    styleClass="p-datatable-striped">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon></th>
+        <th pSortableColumn="rate">Tasa <p-sortIcon field="rate"></p-sortIcon></th>
+        <th>Por Defecto</th>
+        <th>Estado</th>
+        <th style="width: 8rem">Acciones</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-t>
+      <tr>
+        <td>{{ t.name }}</td>
+        <td>{{ t.rate }}%</td>
+        <td>
+          <p-tag [value]="t.isDefault ? 'Sí' : 'No'" [severity]="getDefaultSeverity(t.isDefault)"></p-tag>
+        </td>
+        <td>
+          <p-tag [value]="t.isActive ? 'Activo' : 'Inactivo'" [severity]="getActiveSeverity(t.isActive)"></p-tag>
+        </td>
+        <td>
+          @if (authService.hasPermission('taxes.update')) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" (onClick)="goToEditTax(t)"></p-button>
+          }
+          @if (authService.hasPermission('taxes.delete')) {
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteTax(t)"></p-button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-percentage" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No hay impuestos registrados</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

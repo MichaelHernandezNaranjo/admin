@@ -1,0 +1,110 @@
+.category-attributes {
+  .card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    h3 { margin: 0; color: var(--text-color); }
+  }
+
+  .text-muted    { color: var(--text-color-secondary); }
+  .text-success  { color: #4ade80; }
+
+  .options-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .option-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--surface-100);
+    border: 1px solid var(--surface-border);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: var(--text-color);
+
+    .option-remove {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 50%;
+      color: var(--text-color-secondary);
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--red-100);
+        color: var(--red-500);
+      }
+
+      i { font-size: 0.625rem; }
+    }
+  }
+
+  .add-option-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px dashed var(--surface-border);
+    background: transparent;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: var(--text-color-secondary);
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--p-primary-color);
+      color: var(--p-primary-color);
+      background: var(--primary-50);
+    }
+
+    i { font-size: 0.75rem; }
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    gap: 1rem;
+
+    p { margin: 0; color: var(--text-color-secondary); }
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-color-secondary);
+    }
+  }
+
+  .w-full { width: 100%; }
+  .flex { display: flex; }
+  .gap-2 { gap: 0.5rem; }
+  .ml-2 { margin-left: 0.5rem; }
+  .flex-align-center { align-items: center; }
+}

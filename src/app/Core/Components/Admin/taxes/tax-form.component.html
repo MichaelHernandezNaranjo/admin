@@ -1,0 +1,43 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingTax() ? 'Editar' : 'Nuevo' }} Impuesto</h1>
+  </div>
+</div>
+
+<div class="card form-card">
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="name">Nombre</label>
+      <input 
+        pInputText 
+        id="name" 
+        [(ngModel)]="formData.name" 
+        placeholder="Nombre del impuesto"
+        class="w-full"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="rate">Tasa %</label>
+      <p-inputnumber 
+        [(ngModel)]="formData.rate" 
+        [min]="0" 
+        [max]="100"
+        styleClass="w-full"
+      ></p-inputnumber>
+    </div>
+
+    <div class="form-field checkbox-field">
+      <p-checkbox [(ngModel)]="formData.isDefault" [binary]="true" inputId="isDefault"></p-checkbox>
+      <label for="isDefault">Por Defecto</label>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" [loading]="isLoading()" (onClick)="saveTax()"></p-button>
+  </div>
+</div>
+
+<p-toast></p-toast>

@@ -1,0 +1,122 @@
+<div class="page-header">
+  <h1>Traslados de Mercancía</h1>
+  @if (authService.hasPermission('inventory.transfers.create')) {
+    <p-button label="Nuevo Traslado" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
+  }
+</div>
+
+<p-table [value]="transfers()" [paginator]="true" [rows]="pageSize" [totalRecords]="totalCount()"
+  [lazy]="true" (onPage)="onPageChange($event)" [tableStyle]="{ 'min-width': '60rem' }"
+  styleClass="p-datatable-striped">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Nro. Ref</th>
+      <th>Producto</th>
+      <th>SKU/Referencia</th>
+      <th>Origen</th>
+      <th>Destino</th>
+      <th>Cantidad</th>
+      <th>Estado</th>
+      <th>Fecha</th>
+      <th style="width: 80px">Acciones</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-t>
+    <tr>
+      <td>{{ t.reference || 'N/A' }}</td>
+      <td>{{ t.product?.name || 'N/A' }}</td>
+      <td>{{ t.productReference?.referenceCode || '-' }}</td>
+      <td>{{ t.sourceWarehouse?.name || 'N/A' }}</td>
+      <td>{{ t.targetWarehouse?.name || 'N/A' }}</td>
+      <td>{{ t.quantity }}</td>
+      <td>
+        <p-tag [value]="t.status" [severity]="getStatusSeverity(t.status)"></p-tag>
+      </td>
+      <td>{{ t.createdAt | date:'short' }}</td>
+      <td>
+        @if (authService.hasPermission('inventory.transfers.delete')) {
+          <p-button icon="pi pi-trash" [text]="true" severity="danger" pTooltip="Eliminar" (onClick)="deleteTransfer(t.id)"></p-button>
+        }
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="9" class="text-center">No hay traslados de mercancía</td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-dialog header="Nuevo Traslado de Mercancía" [(visible)]="showDialog" [modal]="true" 
+  [style]="{ width: '650px' }" [draggable]="false">
+  <div class="form-grid">
+    <div class="form-row">
+      <div class="form-field">
+        <label for="product">Producto *</label>
+        <p-select [(ngModel)]="formData.productId" [options]="products()" optionLabel="name" optionValue="id" 
+          placeholder="Seleccionar producto" [filter]="true" filterBy="name,productCode" styleClass="w-full"
+          (onChange)="onProductChange($event.value)">
+          <ng-template pTemplate="item" let-p>{{ p.name }} ({{ p.productCode }})</ng-template>
+        </p-select>
+      </div>
+      <div class="form-field">
+        <label for="reference">Referencia (Opcional)</label>
+        <p-select [(ngModel)]="formData.productReferenceId" [options]="productReferences()" 
+          optionLabel="referenceCode" optionValue="id" 
+          placeholder="Seleccionar referencia" styleClass="w-full"
+          [disabled]="!formData.productId || productReferences().length === 0">
+          <ng-template pTemplate="item" let-r>
+            {{ r.referenceCode }}
+            @if (r.attributeValues && r.attributeValues.length > 0) {
+              <span class="text-sm text-gray-500">
+                ({{ getAttributeDisplay(r) }})
+              </span>
+            }
+          </ng-template>
+        </p-select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label for="quantity">Cantidad *</label>
+        <p-inputNumber [(ngModel)]="formData.quantity" [min]="1" styleClass="w-full"></p-inputNumber>
+      </div>
+      <div class="form-field">
+        <label for="status">Estado *</label>
+        <p-select [(ngModel)]="formData.status" [options]="statuses" placeholder="Seleccionar estado" styleClass="w-full"></p-select>
+      </div>
+    </div>
+    <div class="form-row warehouse-row">
+      <div class="form-field">
+        <label for="source">Bodega Origen *</label>
+        <p-select [(ngModel)]="formData.sourceWarehouseId" [options]="warehouses()" optionLabel="name" optionValue="id" 
+          placeholder="Seleccionar origen" styleClass="w-full"></p-select>
+      </div>
+      <i class="pi pi-arrow-right transfer-icon"></i>
+      <div class="form-field">
+        <label for="target">Bodega Destino *</label>
+        <p-select [(ngModel)]="formData.targetWarehouseId" [options]="warehouses()" optionLabel="name" optionValue="id" 
+          placeholder="Seleccionar destino" styleClass="w-full"></p-select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field full">
+        <label for="reference">Nro. Referencia</label>
+        <input pInputText [(ngModel)]="formData.reference" placeholder="Número de referencia" class="w-full" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field full">
+        <label for="notes">Notas</label>
+        <textarea pInputTextarea [(ngModel)]="formData.notes" [rows]="2" class="w-full"></textarea>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="closeDialog()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" (onClick)="saveTransfer()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>

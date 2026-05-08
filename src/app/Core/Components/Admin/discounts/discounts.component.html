@@ -1,0 +1,88 @@
+<div class="page-header">
+  <h1>Descuentos</h1>
+  @if (authService.hasPermission('discounts.create')) {
+    <p-button label="Nuevo Descuento" icon="pi pi-plus" (onClick)="goToNewDiscount()"></p-button>
+  }
+</div>
+
+<div class="card">
+  <p-table
+    [value]="discounts()"
+    [paginator]="true"
+    [rows]="pageSize"
+    [totalRecords]="totalCount()"
+    [loading]="loading()"
+    [lazy]="true"
+    (onPage)="onPage($event)"
+    [first]="first"
+    [tableStyle]="{'min-width': '70rem'}"
+    styleClass="p-datatable-striped">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nombre</th>
+        <th>Descuento</th>
+        <th>Alcance</th>
+        <th>Cupón</th>
+        <th>Vigencia</th>
+        <th>Estado</th>
+        <th style="width: 8rem">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-d>
+      <tr>
+        <td>
+          <span class="discount-name">{{ d.name }}</span>
+          <span *ngIf="d.description" class="discount-desc">{{ d.description }}</span>
+        </td>
+        <td>
+          <p-tag [value]="getTypeLabel(d)" severity="info"></p-tag>
+        </td>
+        <td>
+          <span *ngIf="d.applyToAllProducts" class="scope-all">
+            <i class="pi pi-globe"></i> Todos
+          </span>
+          <span *ngIf="!d.applyToAllProducts" class="scope-partial">
+            {{ getScopeLabel(d) }}
+          </span>
+        </td>
+        <td>
+          <span *ngIf="d.couponCode" class="coupon-badge">
+            <i class="pi pi-ticket"></i> {{ d.couponCode }}
+          </span>
+          <span *ngIf="!d.couponCode" class="auto-badge">
+            <i class="pi pi-bolt"></i> Automático
+          </span>
+        </td>
+        <td class="date-range">
+          {{ d.startDate | date:'dd/MM/yy' }} — {{ d.endDate | date:'dd/MM/yy' }}
+        </td>
+        <td>
+          <p-tag [value]="getStatusLabel(d)" [severity]="getStatusSeverity(d)"></p-tag>
+        </td>
+        <td>
+          @if (authService.hasPermission('discounts.update')) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" (onClick)="goToEditDiscount(d)"></p-button>
+          }
+          @if (authService.hasPermission('discounts.delete')) {
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteDiscount(d)"></p-button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-tag" style="font-size: 3rem; color: #555;"></i>
+            <p>No hay descuentos registrados</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>

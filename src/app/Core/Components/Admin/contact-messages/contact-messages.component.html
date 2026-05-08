@@ -1,0 +1,84 @@
+<p-toast />
+
+<div class="page-header">
+  <div>
+    <h2>Mensajes de contacto</h2>
+    <span *ngIf="unreadCount() > 0" class="unread-badge">{{ unreadCount() }} sin leer</span>
+  </div>
+  <button pButton label="Marcar todos como leídos" icon="pi pi-check-square"
+          severity="secondary" (click)="markAllRead()"
+          [disabled]="unreadCount() === 0"></button>
+</div>
+
+<p-table
+  [value]="messages()"
+  [lazy]="true"
+  [paginator]="true"
+  [rows]="pageSize"
+  [totalRecords]="total()"
+  [loading]="loading()"
+  [first]="first"
+  (onLazyLoad)="load($event)"
+  styleClass="p-datatable-gridlines"
+  [rowHover]="true">
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width:3rem"></th>
+      <th>Nombre</th>
+      <th>Email</th>
+      <th>Asunto</th>
+      <th>Fecha</th>
+      <th style="width:8rem">Acciones</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-msg>
+    <tr [class.unread-row]="!msg.isRead" style="cursor:pointer" (click)="openMessage(msg)">
+      <td style="text-align:center">
+        <i *ngIf="!msg.isRead" class="pi pi-circle-fill" style="color:var(--p-primary-500);font-size:0.6rem"></i>
+      </td>
+      <td [class.font-bold]="!msg.isRead">{{ msg.name }}</td>
+      <td>{{ msg.email }}</td>
+      <td>{{ subjectLabel(msg.subject) }}</td>
+      <td>{{ msg.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+      <td (click)="$event.stopPropagation()">
+        <button pButton icon="pi pi-eye" severity="secondary" [text]="true" size="small"
+                (click)="openMessage(msg)" pTooltip="Ver mensaje"></button>
+        <button pButton icon="pi pi-trash" severity="danger" [text]="true" size="small"
+                (click)="deleteMessage(msg)" pTooltip="Eliminar"></button>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--p-text-muted-color)">No hay mensajes</td></tr>
+  </ng-template>
+</p-table>
+
+<!-- Dialog detalle -->
+<p-dialog
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [modal]="true"
+  [style]="{width:'560px'}"
+  [header]="selectedMessage()?.name ?? 'Mensaje'"
+  [closable]="true">
+
+  @if (selectedMessage(); as msg) {
+    <div class="msg-detail">
+      <div class="msg-meta">
+        <span><i class="pi pi-envelope"></i> {{ msg.email }}</span>
+        <span><i class="pi pi-tag"></i> {{ subjectLabel(msg.subject) }}</span>
+        <span><i class="pi pi-clock"></i> {{ msg.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      <hr />
+      <p class="msg-body">{{ msg.message }}</p>
+      <div class="msg-actions">
+        <a [href]="'mailto:' + msg.email" pButton label="Responder por correo" icon="pi pi-send" severity="primary"></a>
+        <button pButton label="Eliminar" icon="pi pi-trash" severity="danger" [outlined]="true"
+                (click)="deleteMessage(msg)"></button>
+      </div>
+    </div>
+  }
+</p-dialog>

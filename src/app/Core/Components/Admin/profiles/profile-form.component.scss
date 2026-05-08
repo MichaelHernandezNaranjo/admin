@@ -1,0 +1,124 @@
+.page-header { margin-bottom: 1.5rem; }
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+}
+
+.form-card { max-width: 800px; }
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &.checkbox-field {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+
+    label {
+      font-weight: normal;
+      margin: 0;
+    }
+  }
+
+  label {
+    font-weight: 500;
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+  }
+}
+
+.w-full { width: 100%; }
+
+.permissions-section {
+  label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+  }
+}
+
+.permission-groups {
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--surface-100);
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 3px; }
+}
+
+.perm-group {
+  margin-bottom: 1.5rem;
+
+  &:last-child { margin-bottom: 0; }
+
+  > strong {
+    display: block;
+    color: var(--p-primary-color);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+  }
+}
+
+.perm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.perm-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+
+  label {
+    font-size: 0.875rem;
+    color: var(--text-color);
+    cursor: pointer;
+    font-weight: normal;
+  }
+}
+
+.loading {
+  color: var(--text-color-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--surface-border);
+}

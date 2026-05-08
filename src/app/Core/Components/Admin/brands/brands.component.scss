@@ -1,0 +1,41 @@
+.empty-state {
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  p {
+    color: var(--text-muted-color);
+    margin: 0;
+  }
+}
+
+.table-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.brand-logo-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: var(--surface-100);
+  padding: 4px;
+  display: block;
+}
+
+.brand-logo-placeholder {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-100);
+  border-radius: 6px;
+  color: var(--text-muted-color);
+  font-size: 1.25rem;
+}
+

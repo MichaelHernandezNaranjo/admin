@@ -1,0 +1,158 @@
+<p-toolbar styleClass="page-toolbar">
+  <ng-template pTemplate="start">
+    <div class="toolbar-title">
+      <i class="pi pi-box"></i>
+      <h2>Productos</h2>
+      <p-tag [value]="totalRecords() + ' productos'" severity="secondary"></p-tag>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    @if (authService.hasPermission('products.create')) {
+      <p-button label="Nuevo Producto" icon="pi pi-plus" (onClick)="goToNewProduct()"></p-button>
+    }
+  </ng-template>
+</p-toolbar>
+
+<div class="card">
+  <div class="filters-bar">
+    <p-inputGroup class="search-input">
+      <p-inputGroupAddon>
+        <i class="pi pi-search"></i>
+      </p-inputGroupAddon>
+      <input
+        pInputText
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Buscar por nombre, código o categoría..."
+      />
+    </p-inputGroup>
+  </div>
+
+  <p-table
+    #dt
+    [value]="products()"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [lazy]="true"
+    (onPage)="onPage($event)"
+    (onSort)="onSort($event)"
+    [first]="first"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [tableStyle]="{'min-width': '50rem'}"
+    styleClass="products-table">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:4rem"></th>
+        <th pSortableColumn="name">Producto <p-sortIcon field="name"></p-sortIcon></th>
+        <th pSortableColumn="category">Categoría <p-sortIcon field="category"></p-sortIcon></th>
+        <th pSortableColumn="price" style="width:10rem">Precio <p-sortIcon field="price"></p-sortIcon></th>
+        <th style="width:7rem">Estado</th>
+        <th style="width:7rem">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-product>
+      <tr class="product-row">
+        <!-- Imagen -->
+        <td class="img-cell">
+          @if (product.imageUrl) {
+            <img [src]="product.imageUrl" [alt]="product.name" class="product-thumb" />
+          } @else {
+            <div class="product-thumb-placeholder">
+              <i class="pi pi-image"></i>
+            </div>
+          }
+        </td>
+
+        <!-- Nombre + código + tags -->
+        <td class="name-cell">
+          <div class="product-name">{{ product.name }}</div>
+          <div class="product-meta">
+            <span class="product-code">{{ product.productCode }}</span>
+            @if (product.brandName) {
+              <span class="product-brand">{{ product.brandName }}</span>
+            }
+          </div>
+          @if (product.tags) {
+            <div class="product-tags">
+              @for (tag of parseTags(product.tags); track tag) {
+                <span class="product-tag">{{ tag }}</span>
+              }
+            </div>
+          }
+        </td>
+
+        <!-- Categoría -->
+        <td>
+          @if (product.categoryName) {
+            <span class="category-badge">{{ product.categoryName }}</span>
+          } @else {
+            <span class="text-muted">—</span>
+          }
+        </td>
+
+        <!-- Precio -->
+        <td class="price-cell">
+          @if (product.discountedPrice && product.discountedPrice < product.price) {
+            <span class="price-original">{{ product.price | currency:'MXN':'symbol':'1.0-0' }}</span>
+            <span class="price-discounted">{{ product.discountedPrice | currency:'MXN':'symbol':'1.0-0' }}</span>
+          } @else {
+            <span class="price-normal">{{ product.price | currency:'MXN':'symbol':'1.0-0' }}</span>
+          }
+        </td>
+
+        <!-- Estado -->
+        <td>
+          <p-tag
+            [value]="product.isActive ? 'Activo' : 'Inactivo'"
+            [severity]="getSeverity(product.isActive)">
+          </p-tag>
+        </td>
+
+        <!-- Acciones -->
+        <td>
+          <div class="action-buttons">
+            @if (authService.hasPermission('products.update')) {
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                severity="secondary"
+                pTooltip="Editar"
+                (onClick)="goToEditProduct(product)">
+              </p-button>
+            }
+            @if (authService.hasPermission('products.delete')) {
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                severity="danger"
+                pTooltip="Eliminar"
+                (onClick)="deleteProduct(product)">
+              </p-button>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6">
+          <div class="empty-state">
+            <i class="pi pi-box"></i>
+            <p>No hay productos registrados</p>
+            @if (authService.hasPermission('products.create')) {
+              <p-button label="Crear primer producto" icon="pi pi-plus" severity="secondary" [outlined]="true" (onClick)="goToNewProduct()"></p-button>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

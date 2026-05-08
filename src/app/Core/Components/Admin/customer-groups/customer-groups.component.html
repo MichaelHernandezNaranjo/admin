@@ -1,0 +1,114 @@
+<div class="page-header">
+  <h1>Grupos de Clientes</h1>
+  @if (authService.hasPermission('customergroups.create')) {
+    <p-button label="Nuevo Grupo" icon="pi pi-plus" (onClick)="goToNewGroup()"></p-button>
+  }
+</div>
+
+<div class="card">
+  <p-table 
+    [value]="groups()" 
+    [paginator]="true" 
+    [rows]="pageSize" 
+    [totalRecords]="totalCount()"
+    [loading]="loading()"
+    [lazy]="true" 
+    (onPage)="onPage($event)"
+    [first]="first"
+    [tableStyle]="{'min-width': '60rem'}"
+    styleClass="p-datatable-striped">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon></th>
+        <th>Descripción</th>
+        <th>Descuento %</th>
+        <th>Estado</th>
+        <th style="width: 10rem">Acciones</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-g>
+      <tr>
+        <td>{{ g.name }}</td>
+        <td>{{ g.description }}</td>
+        <td>{{ g.discountPercentage }}%</td>
+        <td>
+          <p-tag [value]="g.isActive ? 'Activo' : 'Inactivo'" [severity]="getActiveSeverity(g.isActive)"></p-tag>
+        </td>
+        <td>
+          <p-button icon="pi pi-users" [rounded]="true" [text]="true" severity="secondary" pTooltip="Administrar Clientes" (onClick)="openCustomersDialog(g)"></p-button>
+          @if (authService.hasPermission('customergroups.update')) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" (onClick)="goToEditGroup(g)"></p-button>
+          }
+          @if (authService.hasPermission('customergroups.delete')) {
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteGroup(g)"></p-button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-users" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No hay grupos de clientes registrados</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog header="Clientes en: {{ editingGroup()?.name }}" 
+  [(visible)]="showCustomersDialog" [modal]="true" [style]="{ width: '800px' }" [draggable]="false">
+  
+  <div class="add-section">
+    <h4>Agregar Cliente</h4>
+    <div class="add-row">
+      <p-select [(ngModel)]="selectedCustomerId" [options]="availableCustomers()" optionLabel="firstName" 
+        optionValue="id" placeholder="Seleccionar Cliente" [filter]="true" styleClass="w-full customer-select">
+        <ng-template pTemplate="item" let-c>
+          {{ c.firstName }} {{ c.lastName }} ({{ c.email }})
+        </ng-template>
+      </p-select>
+      <p-button label="Agregar" icon="pi pi-plus" (onClick)="addCustomerToGroup()" [disabled]="!selectedCustomerId"></p-button>
+    </div>
+  </div>
+  
+  <div class="customers-section">
+    <h4>Clientes en este Grupo ({{ groupCustomers().length }})</h4>
+    @if (groupCustomers().length === 0) {
+      <p class="empty-message">No hay clientes en este grupo.</p>
+    } @else {
+      <p-table [value]="groupCustomers()" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th style="width: 80px"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-c>
+          <tr>
+            <td>{{ c.firstName }} {{ c.lastName }}</td>
+            <td>{{ c.email }}</td>
+            <td>{{ c.phone }}</td>
+            <td>
+              <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="removeCustomerFromGroup(c)"></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <p-button label="Cerrar" severity="secondary" [outlined]="true" (onClick)="closeCustomersDialog()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

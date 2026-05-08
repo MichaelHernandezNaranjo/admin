@@ -1,0 +1,64 @@
+<div class="page-header">
+  <h1>Inventario</h1>
+  <p-button label="Exportar a CSV" icon="pi pi-download" (onClick)="exportToExcel()"></p-button>
+</div>
+
+<div class="filters">
+  <p-select [(ngModel)]="selectedWarehouseId" [options]="warehouses()" optionLabel="name" optionValue="id"
+    placeholder="Todas las bodegas" [showClear]="true" (onChange)="onWarehouseChange()"
+    styleClass="filter-select"></p-select>
+
+  <p-select [(ngModel)]="selectedProductId" [options]="products()" optionLabel="name" optionValue="id"
+    placeholder="Todos los productos" [showClear]="true" (onChange)="onProductChange()" [filter]="true"
+    filterBy="name,productCode" styleClass="filter-select">
+    <ng-template pTemplate="item" let-product>
+      {{ product.name }} ({{ product.productCode }})
+    </ng-template>
+  </p-select>
+
+  <span class="p-input-icon-left">
+    <i class="pi pi-search"></i>
+    <input pInputText [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event); onSearchChange()" 
+      placeholder="Buscar por SKU, nombre o bodega" />
+  </span>
+
+  <p-select [(ngModel)]="sortBy" [options]="sortOptions" optionLabel="label" optionValue="value"
+    (onChange)="onSortChange()" styleClass="filter-select"></p-select>
+
+  <p-button [icon]="sortOrder() === 'asc' ? 'pi pi-sort-amount-up' : 'pi pi-sort-amount-down'" 
+    [text]="true" (onClick)="onSortChange()" [pTooltip]="sortOrder() === 'asc' ? 'Ascendente' : 'Descendente'" tooltipPosition="top"></p-button>
+
+  <p-button label="Limpiar" icon="pi pi-filter-slash" [text]="true" (onClick)="clearFilters()"></p-button>
+</div>
+
+<p-table [value]="inventories()" [paginator]="true" [rows]="pageSize" [totalRecords]="totalCount()"
+  [lazy]="true" (onPage)="onPageChange($event)" [tableStyle]="{ 'min-width': '60rem' }"
+  styleClass="p-datatable-striped">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>SKU</th>
+      <th>Producto</th>
+      <th>Almacén</th>
+      <th>Cantidad</th>
+      <th>Stock Mín</th>
+      <th>Reservado</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-i>
+    <tr>
+      <td>{{ i.product?.productCode || 'N/A' }}</td>
+      <td>{{ i.product?.name || 'N/A' }}</td>
+      <td>{{ i.warehouse?.name || 'N/A' }}</td>
+      <td>{{ i.quantity }}</td>
+      <td>{{ i.minStock }}</td>
+      <td>{{ i.reservedQuantity }}</td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="6" class="text-center">No hay inventario</td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-toast></p-toast>

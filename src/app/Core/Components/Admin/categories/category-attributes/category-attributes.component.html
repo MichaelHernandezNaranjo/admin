@@ -1,0 +1,193 @@
+<div class="category-attributes">
+  <p-toast></p-toast>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Atributos de Categoria</h3>
+      <p-button 
+        label="Nuevo Atributo" 
+        icon="pi pi-plus" 
+        (click)="openAttributeDialog()">
+      </p-button>
+    </div>
+
+    <p-table 
+      [value]="attributes()" 
+      [loading]="isLoading()"
+      styleClass="p-datatable-sm"
+      responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 40%">Nombre</th>
+          <th style="width: 15%">Tipo</th>
+          <th style="width: 10%">Requerido</th>
+          <th style="width: 25%">Opciones</th>
+          <th style="width: 10%">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-attribute>
+        <tr>
+          <td>
+            <div class="flex align-items-center gap-2">
+              <i [class]="attribute.isInherited ? 'pi pi-lock text-muted' : 'pi pi-pencil'"></i>
+              <span>{{ attribute.name }}</span>
+              @if (attribute.isInherited) {
+                <p-tag value="Heredado" severity="info"></p-tag>
+              }
+            </div>
+          </td>
+          <td>
+            <span class="p-tag">{{ attribute.dataType }}</span>
+          </td>
+          <td>
+            <i [class]="attribute.isRequired ? 'pi pi-check text-success' : 'pi pi-times text-muted'"></i>
+          </td>
+          <td>
+            <div class="options-list">
+              @for (option of getOptionsArray(attribute.options); track option.id) {
+                <span class="option-badge">
+                  {{ option.value }}
+                  @if (!attribute.isInherited) {
+                    <button 
+                      type="button" 
+                      class="option-remove" 
+                      (click)="deleteOption(option)">
+                      <i class="pi pi-times"></i>
+                    </button>
+                  }
+                </span>
+              }
+              @if (!attribute.isInherited) {
+                <button 
+                  type="button" 
+                  class="add-option-btn"
+                  (click)="openOptionDialog(attribute)">
+                  <i class="pi pi-plus"></i> Agregar
+                </button>
+              }
+            </div>
+          </td>
+          <td>
+            @if (!attribute.isInherited) {
+              <div class="flex gap-2">
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-pencil" 
+                  class="p-button-rounded p-button-sm p-button-success"
+                  (click)="openAttributeDialog(attribute)"
+                  pTooltip="Editar">
+                </button>
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-trash" 
+                  class="p-button-rounded p-button-sm p-button-danger"
+                  (click)="deleteAttribute(attribute)"
+                  pTooltip="Eliminar">
+                </button>
+              </div>
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center">
+            <div class="empty-state">
+              <i class="pi pi-tag" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
+              <p>No hay atributos definidos para esta categoria</p>
+              <p-button 
+                label="Crear primer atributo" 
+                icon="pi pi-plus" 
+                (click)="openAttributeDialog()">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <p-dialog 
+    header="{{ editingAttribute() ? 'Editar Atributo' : 'Nuevo Atributo' }}" 
+    [(visible)]="showAttributeDialog" 
+    [modal]="true" 
+    [style]="{width: '400px'}"
+    [draggable]="false">
+    <div class="form-group">
+      <label for="attributeName">Nombre</label>
+      <input 
+        pInputText 
+        id="attributeName" 
+        [(ngModel)]="attributeForm.name" 
+        placeholder="Ej: Color, Talla, Marca"
+        class="w-full" />
+    </div>
+    
+    <div class="form-group">
+      <label for="dataType">Tipo de Dato</label>
+      <p-select 
+        id="dataType"
+        [(ngModel)]="attributeForm.dataType" 
+        [options]="dataTypes" 
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Seleccionar tipo"
+        class="w-full">
+      </p-select>
+    </div>
+    
+    <div class="form-group">
+      <p-checkbox 
+        [(ngModel)]="attributeForm.isRequired" 
+        [binary]="true" 
+        inputId="isRequired">
+      </p-checkbox>
+      <label for="isRequired" class="ml-2">Requerido</label>
+    </div>
+    
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="Cancelar" 
+        severity="secondary" 
+        (click)="closeAttributeDialog()">
+      </p-button>
+      <p-button 
+        label="Guardar" 
+        (click)="saveAttribute()"
+        [loading]="isLoading()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog 
+    header="{{ editingOption() ? 'Editar Opcion' : 'Nueva Opcion' }}"
+    [(visible)]="showOptionDialog" 
+    [modal]="true" 
+    [style]="{width: '350px'}"
+    [draggable]="false">
+    <div class="form-group">
+      <label for="optionValue">Valor</label>
+      <input 
+        pInputText 
+        id="optionValue" 
+        [(ngModel)]="optionForm.value" 
+        placeholder="Ej: Rojo, M, XL, Grande"
+        class="w-full" />
+    </div>
+    
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="Cancelar" 
+        severity="secondary" 
+        (click)="closeOptionDialog()">
+      </p-button>
+      <p-button 
+        label="Guardar" 
+        (click)="saveOption()"
+        [loading]="isLoading()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+</div>

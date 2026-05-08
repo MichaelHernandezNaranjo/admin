@@ -1,0 +1,50 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingGroup() ? 'Editar' : 'Nuevo' }} Grupo de Clientes</h1>
+  </div>
+</div>
+
+<div class="card form-card">
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="name">Nombre</label>
+      <input 
+        pInputText 
+        id="name" 
+        [(ngModel)]="formData.name" 
+        placeholder="Nombre del grupo"
+        class="w-full"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="description">Descripción</label>
+      <textarea 
+        pInputTextarea 
+        id="description" 
+        [(ngModel)]="formData.description" 
+        [rows]="3"
+        placeholder="Descripción"
+        class="w-full"
+      ></textarea>
+    </div>
+
+    <div class="form-field">
+      <label for="discount">Descuento %</label>
+      <p-inputnumber 
+        [(ngModel)]="formData.discountPercentage" 
+        [min]="0" 
+        [max]="100"
+        styleClass="w-full"
+      ></p-inputnumber>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" [loading]="isLoading()" (onClick)="saveGroup()"></p-button>
+  </div>
+</div>
+
+<p-toast></p-toast>

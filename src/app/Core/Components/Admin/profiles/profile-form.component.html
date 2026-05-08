@@ -1,0 +1,72 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingProfile() ? 'Editar' : 'Nuevo' }} Perfil</h1>
+  </div>
+</div>
+
+<div class="card form-card">
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="name">Nombre</label>
+      <input 
+        pInputText 
+        id="name" 
+        [(ngModel)]="formName" 
+        placeholder="Nombre del perfil"
+        class="w-full"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="description">Descripción</label>
+      <input 
+        pInputText 
+        id="description" 
+        [(ngModel)]="formDescription" 
+        placeholder="Descripción del perfil"
+        class="w-full"
+      />
+    </div>
+
+    <div class="form-field checkbox-field">
+      <p-checkbox [(ngModel)]="formIsActive" [binary]="true" inputId="isActive"></p-checkbox>
+      <label for="isActive">Activo</label>
+    </div>
+
+    <div class="permissions-section">
+      <label>Permisos ({{ formPermissions.length }} seleccionados)</label>
+      @if (permissionGroups.length > 0) {
+        <div class="permission-groups">
+          @for (group of permissionGroups; track group.name) {
+            <div class="perm-group">
+              <strong>{{ group.name }}</strong>
+              <div class="perm-grid">
+                @for (perm of group.permissions; track perm.id) {
+                  <div class="perm-item">
+                    <p-checkbox 
+                      [value]="perm.name" 
+                      [(ngModel)]="formPermissions"
+                      [inputId]="perm.id"
+                      (onChange)="onPermissionChange(perm.name, formPermissions.includes(perm.name))">
+                    </p-checkbox>
+                    <label [for]="perm.id">{{ perm.name }}</label>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="loading">Cargando permisos...</p>
+      }
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" [loading]="isLoading()" (onClick)="saveProfile()"></p-button>
+  </div>
+</div>
+
+<p-toast></p-toast>

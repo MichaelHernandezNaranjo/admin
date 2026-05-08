@@ -1,0 +1,195 @@
+<div class="product-references">
+  <p-toast></p-toast>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Referencias de Producto</h3>
+      @if (categoryId) {
+        <p-button 
+          label="Nueva Referencia" 
+          icon="pi pi-plus" 
+          (click)="openReferenceDialog()">
+        </p-button>
+      }
+    </div>
+
+    @if (!categoryId) {
+      <div class="warning-message">
+        <i class="pi pi-info-circle"></i>
+        <span>Asigne una categoria al producto para poder crear referencias</span>
+      </div>
+    } @else {
+      <p-table 
+        [value]="references()" 
+        [loading]="isLoading()"
+        styleClass="p-datatable-sm"
+        responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 20%">Codigo (SKU)</th>
+            <th>Atributos</th>
+            <th style="width: 15%">Precio</th>
+            <th style="width: 12%">Stock</th>
+            <th style="width: 10%">Estado</th>
+            <th style="width: 12%">Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-reference>
+          <tr>
+            <td>
+              <div class="reference-code">
+                <span class="sku">{{ reference.id.substring(0, 8).toUpperCase() }}</span>
+                <span class="code">{{ reference.referenceCode }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="attributes-display">
+                @for (attr of reference.attributeValues; track attr.id) {
+                  <p-tag [value]="attr.optionValue || ''" severity="info"></p-tag>
+                }
+              </div>
+            </td>
+            <td>
+              {{ reference.price | currency:'USD':'symbol':'1.2-2' }}
+            </td>
+            <td>
+              @if (reference.inventory) {
+                <span [class]="'stock-badge stock-' + getStockStatus(reference.inventory.quantity, reference.inventory.minStock)">
+                  {{ reference.inventory.quantity }}
+                </span>
+                <span class="stock-info">Min: {{ reference.inventory.minStock }}</span>
+              } @else {
+                <span class="text-muted">Sin stock</span>
+              }
+            </td>
+            <td>
+              <p-tag 
+                [value]="reference.isActive ? 'Activo' : 'Inactivo'" 
+                [severity]="reference.isActive ? 'success' : 'warn'">
+              </p-tag>
+            </td>
+            <td>
+              <div class="flex gap-2">
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-pencil" 
+                  class="p-button-rounded p-button-sm p-button-success"
+                  (click)="openReferenceDialog(reference)"
+                  pTooltip="Editar">
+                </button>
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-trash" 
+                  class="p-button-rounded p-button-sm p-button-danger"
+                  (click)="deleteReference(reference)"
+                  pTooltip="Eliminar">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center">
+              <div class="empty-state">
+                <i class="pi pi-box" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
+                <p>No hay referencias para este producto</p>
+                <p-button 
+                  label="Crear primera referencia" 
+                  icon="pi pi-plus" 
+                  (click)="openReferenceDialog()">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </div>
+
+  <p-dialog 
+    header="{{ editingReference() ? 'Editar Referencia' : 'Nueva Referencia' }}" 
+    [(visible)]="showReferenceDialog" 
+    [modal]="true" 
+    [style]="{width: '600px'}"
+    [draggable]="false">
+    
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="referenceCode">Codigo de Referencia *</label>
+        <input 
+          pInputText 
+          id="referenceCode" 
+          [(ngModel)]="referenceForm.referenceCode" 
+          placeholder="Ej: ROJO-M, NEGRO-L"
+          class="w-full" />
+      </div>
+      
+      <div class="form-group">
+        <label for="barcode">Codigo de Barras</label>
+        <input 
+          pInputText 
+          id="barcode" 
+          [(ngModel)]="referenceForm.barcode" 
+          placeholder="EAN, UPC, etc."
+          class="w-full" />
+      </div>
+      
+      <div class="form-group full-width">
+        <label for="price">Precio</label>
+        <p-inputNumber 
+          id="price"
+          [(ngModel)]="referenceForm.price" 
+          mode="currency" 
+          currency="USD"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          class="w-full">
+        </p-inputNumber>
+      </div>
+    </div>
+    
+    <div class="attributes-section">
+      <h4>Valores de Atributos</h4>
+      @if (attributes().length === 0) {
+        <div class="no-attributes-warning">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span>No hay atributos definidos para la categoria del producto</span>
+        </div>
+      } @else {
+        <div class="attributes-list">
+          @for (attr of attributes(); track attr.id) {
+            <div class="attribute-row">
+              <label>{{ attr.name }} {{ attr.isRequired ? '*' : '' }}</label>
+              <p-select 
+                [options]="getAttributeOptions(attr.id)"
+                [(ngModel)]="selectedAttributeOptions[attr.id]"
+                (onChange)="onAttributeOptionChange(attr.id, $event.value)"
+                optionLabel="value"
+                optionValue="id"
+                placeholder="Seleccionar {{ attr.name }}"
+                [showClear]="!attr.isRequired"
+                class="w-full">
+              </p-select>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="Cancelar" 
+        severity="secondary" 
+        (click)="closeReferenceDialog()">
+      </p-button>
+      <p-button 
+        label="Guardar" 
+        (click)="saveReference()"
+        [loading]="isLoading()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+</div>

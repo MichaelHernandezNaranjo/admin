@@ -1,0 +1,66 @@
+<div class="page-header">
+  <h1>Listas de Precios</h1>
+  @if (authService.hasPermission('pricelists.create')) {
+    <p-button label="Nueva Lista" icon="pi pi-plus" (onClick)="goToNewPriceList()"></p-button>
+  }
+</div>
+
+<div class="card">
+  <p-table 
+    [value]="priceLists()" 
+    [paginator]="true" 
+    [rows]="pageSize" 
+    [totalRecords]="totalCount()"
+    [loading]="loading()"
+    [lazy]="true" 
+    (onPage)="onPage($event)"
+    [first]="first"
+    [tableStyle]="{'min-width': '60rem'}"
+    styleClass="p-datatable-striped">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon></th>
+        <th>Descripción</th>
+        <th>Por Defecto</th>
+        <th>Estado</th>
+        <th style="width: 10rem">Acciones</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-p>
+      <tr>
+        <td>{{ p.name }}</td>
+        <td>{{ p.description }}</td>
+        <td>
+          <p-tag [value]="p.isDefault ? 'Sí' : 'No'" [severity]="getDefaultSeverity(p.isDefault)"></p-tag>
+        </td>
+        <td>
+          <p-tag [value]="p.isActive ? 'Activo' : 'Inactivo'" [severity]="getActiveSeverity(p.isActive)"></p-tag>
+        </td>
+        <td>
+          @if (authService.hasPermission('pricelists.update')) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" (onClick)="goToEditPriceList(p)"></p-button>
+          }
+          @if (authService.hasPermission('pricelists.delete')) {
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deletePriceList(p)"></p-button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-list" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No hay listas de precios registradas</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

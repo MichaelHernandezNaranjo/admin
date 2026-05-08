@@ -1,0 +1,206 @@
+<p-toast />
+
+@if (loading()) {
+  <div class="od-loading"><i class="pi pi-spin pi-spinner"></i> Cargando pedido...</div>
+} @else if (!order()) {
+  <div class="od-empty">No se encontró el pedido. <a routerLink="/admin/orders">Volver</a></div>
+} @else {
+
+<div class="od-wrapper">
+
+  <!-- Header -->
+  <div class="od-header">
+    <div class="od-header-left">
+      <button pButton icon="pi pi-arrow-left" [text]="true" severity="secondary" (click)="goBack()"></button>
+      <div>
+        <h2 class="od-order-number">{{ order()!.orderNumber }}</h2>
+        <span class="od-date">{{ order()!.orderDate | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      <p-tag [value]="getStatusLabel(order()!.status)" [severity]="getStatusSeverity(order()!.status)" styleClass="od-status-tag" />
+    </div>
+    <div class="od-header-actions">
+      @for (action of getNextActions(order()!.status); track action.status) {
+        <button pButton
+          [label]="action.label"
+          [icon]="action.icon"
+          [severity]="$any(action.severity)"
+          [outlined]="action.severity === 'danger'"
+          (click)="requestAction(action)">
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Stepper (solo si no está cancelado) -->
+  @if (order()!.status !== 5) {
+    <div class="od-stepper">
+      @for (step of steps; track step.status; let last = $last) {
+        <div class="od-step" [class]="'od-step--' + stepState(step.status, order()!.status)">
+          <div class="od-step-circle"><i [class]="step.icon"></i></div>
+          <span class="od-step-label">{{ step.label }}</span>
+        </div>
+        @if (!last) { <div class="od-step-line" [class.od-step-line--done]="step.status < order()!.status"></div> }
+      }
+    </div>
+  } @else {
+    <div class="od-cancelled-bar"><i class="pi pi-times-circle"></i> Pedido cancelado</div>
+  }
+
+  <!-- Body: dos columnas -->
+  <div class="od-body">
+
+    <!-- Columna izquierda -->
+    <div class="od-col">
+
+      <!-- Cliente -->
+      <div class="od-card">
+        <h3 class="od-card-title"><i class="pi pi-user"></i> Cliente</h3>
+        <div class="od-info-list">
+          <div class="od-info-row"><span class="od-info-label">Nombre</span><span>{{ order()!.customerName ?? '—' }}</span></div>
+          <div class="od-info-row"><span class="od-info-label">Email</span><span>{{ order()!.customerEmail ?? '—' }}</span></div>
+          <div class="od-info-row">
+            <span class="od-info-label">Teléfono</span>
+            @if (order()!.customerPhone) {
+              <a [href]="'https://wa.me/57' + order()!.customerPhone!.replace(/\s/g,'')"
+                 target="_blank" class="od-whatsapp-link">
+                <i class="pi pi-whatsapp"></i> {{ order()!.customerPhone }}
+              </a>
+            } @else { <span>—</span> }
+          </div>
+        </div>
+      </div>
+
+      <!-- Entrega -->
+      <div class="od-card">
+        <h3 class="od-card-title"><i class="pi pi-map-marker"></i> Entrega</h3>
+        <div class="od-info-list">
+          <div class="od-info-row"><span class="od-info-label">Dirección</span><span>{{ order()!.shippingAddress ?? '—' }}</span></div>
+        </div>
+      </div>
+
+      <!-- Pago -->
+      <div class="od-card">
+        <h3 class="od-card-title"><i class="pi pi-credit-card"></i> Pago</h3>
+        <div class="od-info-list">
+          <div class="od-info-row">
+            <span class="od-info-label">Método</span>
+            <span class="od-payment-badge" [class.od-payment-nequi]="order()!.paymentMethod === 'Nequi'"
+                  [class.od-payment-cod]="order()!.paymentMethod === 'CashOnDelivery'">
+              {{ getPaymentMethodLabel(order()!.paymentMethod) }}
+            </span>
+          </div>
+          @if (order()!.paymentReference) {
+            <div class="od-info-row">
+              <span class="od-info-label">Comprobante</span>
+              <a [href]="getVoucherUrl(order()!.paymentReference)" target="_blank" class="od-voucher-link">
+                <i class="pi pi-image"></i> Ver comprobante
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Notas -->
+      @if (order()!.notes) {
+        <div class="od-card">
+          <h3 class="od-card-title"><i class="pi pi-comment"></i> Notas</h3>
+          <p class="od-notes">{{ order()!.notes }}</p>
+        </div>
+      }
+
+    </div>
+
+    <!-- Columna derecha: items + totales -->
+    <div class="od-col od-col--wide">
+      <div class="od-card">
+        <h3 class="od-card-title"><i class="pi pi-shopping-bag"></i> Productos</h3>
+
+        <table class="od-items-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th style="text-align:center">Qty</th>
+              <th style="text-align:right">Precio unit.</th>
+              <th style="text-align:right">Desc.</th>
+              <th style="text-align:right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of order()!.items; track item.id) {
+              <tr>
+                <td>
+                  <div class="od-item-name">{{ item.productName }}</div>
+                  @if (item.referenceCode) {
+                    <div class="od-item-sku">SKU: {{ item.referenceCode }}</div>
+                  }
+                  @if (item.attributeValues?.length) {
+                    <div class="od-item-attrs">
+                      @for (av of item.attributeValues; track av.attributeName) {
+                        <span class="od-attr-chip">{{ av.attributeName }}: {{ av.optionValue }}</span>
+                      }
+                    </div>
+                  }
+                </td>
+                <td style="text-align:center">{{ item.quantity }}</td>
+                <td style="text-align:right">{{ item.unitPrice | currency:'COP':'symbol':'1.0-0' }}</td>
+                <td style="text-align:right">
+                  @if (item.discount > 0) {
+                    <span class="od-discount">-{{ item.discount | currency:'COP':'symbol':'1.0-0' }}</span>
+                  } @else { — }
+                </td>
+                <td style="text-align:right"><strong>{{ item.total | currency:'COP':'symbol':'1.0-0' }}</strong></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="od-totals">
+          @if (order()!.discountAmount > 0) {
+            <div class="od-total-row">
+              <span>Descuentos</span>
+              <span class="od-discount">-{{ order()!.discountAmount | currency:'COP':'symbol':'1.0-0' }}</span>
+            </div>
+          }
+          <div class="od-total-row">
+            <span>Envío</span><span class="od-free">Gratis</span>
+          </div>
+          <div class="od-total-row od-total-final">
+            <span>Total</span>
+            <span>{{ order()!.total | currency:'COP':'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+}
+
+<!-- Dialog confirmación de acción -->
+<p-dialog
+  [visible]="confirmDialogVisible()"
+  (visibleChange)="confirmDialogVisible.set($event)"
+  [modal]="true"
+  [style]="{width:'440px'}"
+  [header]="pendingAction()?.label ?? 'Confirmar acción'"
+  [closable]="!saving()">
+
+  @if (pendingAction(); as action) {
+    <div class="od-confirm-body">
+      <p>¿Estás seguro de que deseas <strong>{{ action.label | lowercase }}</strong>?</p>
+      <div class="od-field">
+        <label>Nota interna (opcional)</label>
+        <textarea pTextarea [(ngModel)]="actionNotes" rows="3"
+                  placeholder="Ej: Confirmado por teléfono, en camino con motorizados...">
+        </textarea>
+      </div>
+      <div class="od-confirm-actions">
+        <button pButton label="Cancelar" severity="secondary" [outlined]="true"
+                (click)="confirmDialogVisible.set(false)" [disabled]="saving()"></button>
+        <button pButton [label]="action.label" [icon]="saving() ? 'pi pi-spin pi-spinner' : action.icon"
+                [severity]="$any(action.severity)" (click)="confirmAction()" [disabled]="saving()"></button>
+      </div>
+    </div>
+  }
+</p-dialog>

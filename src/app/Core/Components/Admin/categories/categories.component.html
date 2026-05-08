@@ -1,0 +1,77 @@
+<div class="page-header">
+  <h1>Categorías</h1>
+  @if (authService.hasPermission('products.create')) {
+    <p-button label="Nueva Categoría" icon="pi pi-plus" (onClick)="goToNewCategory()"></p-button>
+  }
+</div>
+
+<div class="card">
+  <div class="table-header">
+    <p-inputgroup>
+      <input 
+        type="text" 
+        pInputText 
+        [(ngModel)]="searchTerm" 
+        (input)="onSearch()" 
+        placeholder="Buscar categorías..."
+      />
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-search" [text]="true" severity="secondary" />
+      </p-inputgroup-addon>
+    </p-inputgroup>
+  </div>
+
+  <p-table 
+    [value]="categories()" 
+    [paginator]="true" 
+    [rows]="rows" 
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [lazy]="true"
+    (onSort)="onSort($event)"
+    [first]="first"
+    [tableStyle]="{'min-width': '40rem'}"
+    styleClass="p-datatable-striped">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon></th>
+        <th>Descripción</th>
+        <th pSortableColumn="isActive">Estado <p-sortIcon field="isActive"></p-sortIcon></th>
+        <th style="width: 8rem">Acciones</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-category>
+      <tr>
+        <td>{{ category.name }}</td>
+        <td>{{ category.description }}</td>
+        <td>
+          <p-tag [value]="category.isActive ? 'Activo' : 'Inactivo'" [severity]="getSeverity(category.isActive)"></p-tag>
+        </td>
+        <td>
+          @if (authService.hasPermission('products.update')) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" (onClick)="goToEditCategory(category)"></p-button>
+          }
+          @if (authService.hasPermission('products.delete')) {
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteCategory(category)"></p-button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No hay categorías registradas</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

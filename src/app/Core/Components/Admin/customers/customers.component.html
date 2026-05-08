@@ -1,0 +1,66 @@
+<div class="page-header">
+  <h1>Clientes</h1>
+  @if (authService.hasPermission('customers.create')) {
+    <p-button label="Nuevo Cliente" icon="pi pi-plus" (onClick)="goToNewCustomer()"></p-button>
+  }
+</div>
+
+<div class="card">
+  <p-table 
+    [value]="customers()" 
+    [paginator]="true" 
+    [rows]="pageSize" 
+    [totalRecords]="totalCount()"
+    [loading]="loading()"
+    [lazy]="true" 
+    (onPage)="onPage($event)"
+    [first]="first"
+    [tableStyle]="{'min-width': '60rem'}"
+    styleClass="p-datatable-striped">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+        <th pSortableColumn="firstName">Nombre <p-sortIcon field="firstName"></p-sortIcon></th>
+        <th>Teléfono</th>
+        <th>Grupo</th>
+        <th>Estado</th>
+        <th style="width: 8rem">Acciones</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-c>
+      <tr>
+        <td>{{ c.email }}</td>
+        <td>{{ c.name || 'N/A' }}</td>
+        <td>{{ c.phone || 'N/A' }}</td>
+        <td>{{ c.customerGroup?.name || 'N/A' }}</td>
+        <td>
+          <p-tag [value]="c.isActive ? 'Activo' : 'Inactivo'" [severity]="getActiveSeverity(c.isActive)"></p-tag>
+        </td>
+        <td>
+          @if (authService.hasPermission('customers.update')) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" (onClick)="goToEditCustomer(c)"></p-button>
+          }
+          @if (authService.hasPermission('customers.delete')) {
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteCustomer(c)"></p-button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-users" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No hay clientes registrados</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

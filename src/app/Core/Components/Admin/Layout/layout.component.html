@@ -1,0 +1,50 @@
+<div class="layout-wrapper">
+  <div class="sidebar">
+    <div class="sidebar-inner">
+      <div class="logo-section">
+        <a routerLink="/" class="logo-link">
+          <span class="logo-force">FORCE</span><span class="logo-store">STORE</span>
+        </a>
+      </div>
+      
+      <p-virtualscroller [items]="menuItems()" [itemSize]="40" scrollHeight="calc(100vh - 160px)" styleClass="menu-scroller">
+        <ng-template #item let-item let-options="options">
+          @if (item.type === 'header') {
+            <div class="menu-group-header">{{ item.label }}</div>
+          }
+          @if (item.type === 'item') {
+            <a pRipple [routerLink]="item.routerLink" class="menu-item-link" routerLinkActive="active-link">
+              <span [class]="item.icon"></span>
+              <span class="ms-2">{{ item.label }}</span>
+            </a>
+          }
+          @if (item.type === 'separator') {
+            <div class="menu-separator"></div>
+          }
+        </ng-template>
+      </p-virtualscroller>
+      
+      <div class="menu-footer">
+        <button pRipple class="user-button" (click)="logout()">
+          <p-avatar [label]="getUserAvatar()" shape="circle"></p-avatar>
+          <span class="user-info-text">
+            <span class="font-bold">{{ getUserName() }}</span>
+            <span class="text-sm">{{ getUserRole() }}</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="page-title">{{ currentSection() }}</span>
+      </div>
+    </header>
+    
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

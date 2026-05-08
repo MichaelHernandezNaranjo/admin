@@ -1,0 +1,76 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingUser() ? 'Editar' : 'Nuevo' }} Usuario</h1>
+  </div>
+</div>
+
+<div class="card form-card">
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input 
+        pInputText 
+        id="email" 
+        type="email"
+        [(ngModel)]="formData.email" 
+        placeholder="Email del usuario"
+        class="w-full"
+      />
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label for="firstName">Nombre</label>
+        <input 
+          pInputText 
+          id="firstName" 
+          [(ngModel)]="formData.firstName" 
+          placeholder="Nombre"
+          class="w-full"
+        />
+      </div>
+
+      <div class="form-field">
+        <label for="lastName">Apellido</label>
+        <input 
+          pInputText 
+          id="lastName" 
+          [(ngModel)]="formData.lastName" 
+          placeholder="Apellido"
+          class="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="password">Contraseña</label>
+      <p-password 
+        id="password" 
+        [(ngModel)]="formData.password" 
+        [feedback]="false" 
+        [toggleMask]="true"
+        styleClass="w-full"
+      ></p-password>
+    </div>
+
+    <div class="form-field">
+      <label for="profiles">Perfiles</label>
+      <p-multiselect 
+        [(ngModel)]="formData.profileIds" 
+        [options]="profiles()" 
+        optionLabel="name" 
+        optionValue="id"
+        placeholder="Seleccionar perfiles"
+        styleClass="w-full"
+      ></p-multiselect>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" [loading]="isLoading()" (onClick)="saveUser()"></p-button>
+  </div>
+</div>
+
+<p-toast></p-toast>

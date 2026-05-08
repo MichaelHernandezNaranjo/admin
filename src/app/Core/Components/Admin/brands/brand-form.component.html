@@ -1,0 +1,90 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingBrand() ? 'Editar' : 'Nueva' }} Marca</h1>
+  </div>
+</div>
+
+<div class="card form-card">
+  <div class="form-grid">
+
+    <!-- Nombre -->
+    <div class="form-field">
+      <label for="name">Nombre *</label>
+      <input pInputText id="name" [(ngModel)]="formData.name" placeholder="Nombre de la marca" class="w-full" />
+    </div>
+
+    <!-- Activo -->
+    <div class="form-field checkbox-field">
+      <p-checkbox [(ngModel)]="formData.isActive" [binary]="true" inputId="isActive"></p-checkbox>
+      <label for="isActive">Activo</label>
+    </div>
+
+    <!-- Descripción -->
+    <div class="form-field full-width">
+      <label for="description">Descripción</label>
+      <textarea pInputTextarea id="description" [(ngModel)]="formData.description"
+        [rows]="3" placeholder="Descripción de la marca" class="w-full"></textarea>
+    </div>
+
+    <!-- Logo Upload -->
+    <div class="form-field full-width">
+      <label>Logo de la marca</label>
+
+      <div class="logo-upload-area">
+        <!-- Preview del logo actual -->
+        @if (logoPreview()) {
+          <div class="logo-preview">
+            <img [src]="logoPreview()!" alt="Logo" class="logo-preview-img" />
+            <div class="logo-preview-actions">
+              <span class="logo-preview-name">Logo actual</span>
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                (onClick)="removeLogo()"
+                pTooltip="Quitar logo">
+              </p-button>
+            </div>
+          </div>
+        }
+
+        <!-- FileUpload -->
+        <p-fileupload
+          mode="basic"
+          name="logo"
+          accept="image/*"
+          [maxFileSize]="2097152"
+          chooseLabel="{{ logoPreview() ? 'Cambiar logo' : 'Seleccionar imagen' }}"
+          chooseIcon="pi pi-upload"
+          [auto]="true"
+          [customUpload]="true"
+          (uploadHandler)="onFileSelected($event)"
+          [disabled]="isUploading()"
+          styleClass="logo-uploader">
+        </p-fileupload>
+
+        @if (isUploading()) {
+          <span class="upload-hint"><i class="pi pi-spin pi-spinner"></i> Subiendo...</span>
+        } @else {
+          <span class="upload-hint">JPG, PNG, WEBP, SVG — máx. 2 MB</span>
+        }
+      </div>
+    </div>
+
+  </div>
+
+  <div class="form-actions">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+    <p-button
+      label="Guardar"
+      icon="pi pi-check"
+      [loading]="isLoading()"
+      [disabled]="isUploading()"
+      (onClick)="saveBrand()">
+    </p-button>
+  </div>
+</div>
+
+<p-toast></p-toast>

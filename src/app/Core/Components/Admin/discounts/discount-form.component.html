@@ -1,0 +1,138 @@
+<p-toast />
+
+<div class="discount-form-page">
+  <div class="page-header">
+    <button pButton icon="pi pi-arrow-left" label="Volver" severity="secondary" (click)="goBack()" class="mb-3"></button>
+    <h2>{{ editingDiscount() ? 'Editar Descuento' : 'Nuevo Descuento' }}</h2>
+  </div>
+
+  <p-card>
+    <p-tabs [value]="'0'">
+      <!-- TAB 1: Datos generales -->
+      <p-tablist>
+        <p-tab value="0">Datos generales</p-tab>
+        <p-tab value="1" [disabled]="applyToAllProducts">Productos y categorías</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <div class="form-grid">
+
+            <div class="form-row">
+              <label>Nombre *</label>
+              <input pInputText [(ngModel)]="name" placeholder="Nombre del descuento" class="w-full" />
+            </div>
+
+            <div class="form-row">
+              <label>Descripción</label>
+              <textarea pTextarea [(ngModel)]="description" placeholder="Descripción opcional" rows="2" class="w-full"></textarea>
+            </div>
+
+            <div class="form-row-2col">
+              <div class="form-row">
+                <label>Tipo de descuento</label>
+                <p-select [(ngModel)]="type" [options]="discountTypes" optionLabel="label" optionValue="value" class="w-full" />
+              </div>
+              <div class="form-row">
+                <label>Valor</label>
+                <p-inputNumber [(ngModel)]="value" [min]="0" [max]="type === 'Percentage' ? 100 : 999999"
+                  [suffix]="type === 'Percentage' ? ' %' : ''" [prefix]="type === 'FixedAmount' ? '$ ' : ''"
+                  [minFractionDigits]="2" class="w-full" />
+              </div>
+            </div>
+
+            <div class="form-row-2col">
+              <div class="form-row">
+                <label>Fecha inicio</label>
+                <p-datepicker [(ngModel)]="startDate" dateFormat="dd/mm/yy" [showIcon]="true" class="w-full" />
+              </div>
+              <div class="form-row">
+                <label>Fecha fin</label>
+                <p-datepicker [(ngModel)]="endDate" dateFormat="dd/mm/yy" [showIcon]="true" class="w-full" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>Código de cupón <span class="optional">(dejar vacío = automático)</span></label>
+              <input pInputText [(ngModel)]="couponCode" placeholder="Ej: VERANO25" class="w-full"
+                style="text-transform: uppercase" />
+            </div>
+
+            <div class="form-row toggle-row">
+              <p-toggleswitch [(ngModel)]="applyToAllProducts" />
+              <label>Aplicar a todos los productos</label>
+            </div>
+
+            <div class="form-row toggle-row">
+              <p-toggleswitch [(ngModel)]="isActive" />
+              <label>Activo</label>
+            </div>
+
+          </div>
+        </p-tabpanel>
+
+        <!-- TAB 2: Productos y categorías -->
+        <p-tabpanel value="1">
+          <div *ngIf="applyToAllProducts" class="all-products-notice">
+            <i class="pi pi-info-circle"></i>
+            Este descuento aplica a todos los productos. Desactivá la opción "Aplicar a todos los productos" para seleccionar específicos.
+          </div>
+
+          <div *ngIf="!applyToAllProducts" class="scope-grid">
+
+            <!-- Productos -->
+            <div class="scope-section">
+              <h4>Productos asignados</h4>
+              <p-autoComplete
+                [(ngModel)]="productSearchText"
+                [suggestions]="productSuggestions"
+                field="displayLabel"
+                (completeMethod)="searchProducts($event)"
+                (onSelect)="onProductSelected($event)"
+                placeholder="Buscar producto por nombre o código..."
+                class="w-full"
+                [forceSelection]="false">
+                <ng-template let-item pTemplate="item">
+                  <div style="pointer-events:none">
+                    <span class="product-code">{{ item.productCode }}</span>
+                    <span class="product-name">{{ item.name }}</span>
+                  </div>
+                </ng-template>
+              </p-autoComplete>
+
+              <div class="assigned-list" *ngIf="assignedProducts.length > 0">
+                <div class="assigned-item" *ngFor="let p of assignedProducts">
+                  <span class="item-code">{{ p.productCode }}</span>
+                  <span class="item-name">{{ p.name }}</span>
+                  <button pButton icon="pi pi-times" severity="danger" [text]="true" [rounded]="true"
+                    (click)="removeProduct(p.id)"></button>
+                </div>
+              </div>
+              <p *ngIf="assignedProducts.length === 0" class="empty-msg">Sin productos asignados</p>
+            </div>
+
+            <!-- Categorías -->
+            <div class="scope-section">
+              <h4>Categorías asignadas</h4>
+              <div class="categories-grid">
+                <div class="cat-item" *ngFor="let cat of allCategories" (click)="toggleCategory(cat.id)"
+                  [class.selected]="isCategorySelected(cat.id)">
+                  <i class="pi" [class.pi-check-square]="isCategorySelected(cat.id)" [class.pi-stop]="!isCategorySelected(cat.id)"></i>
+                  <span>{{ cat.name }}</span>
+                </div>
+              </div>
+              <p *ngIf="allCategories.length === 0" class="empty-msg">Sin categorías cargadas</p>
+            </div>
+
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+
+    <div class="form-actions">
+      <button pButton label="Cancelar" severity="secondary" (click)="goBack()"></button>
+      <button pButton label="{{ editingDiscount() ? 'Guardar cambios' : 'Crear descuento' }}"
+        icon="pi pi-check" (click)="saveDiscount()" [loading]="isLoading()"></button>
+    </div>
+  </p-card>
+</div>

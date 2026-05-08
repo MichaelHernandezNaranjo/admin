@@ -1,0 +1,64 @@
+import { Routes } from '@angular/router';
+import { authGuard } from './Core/Guards';
+
+export const routes: Routes = [
+  {
+    path: 'login',
+    loadComponent: () => import('./Core/Components/Login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard],
+    loadComponent: () => import('./Core/Components/Admin/Layout/layout.component').then(m => m.LayoutComponent),
+    children: [
+      { path: 'dashboard',              loadComponent: () => import('./Core/Components/Admin/Dashboard/dashboard.component').then(m => m.DashboardComponent) },
+      { path: 'products',               loadComponent: () => import('./Core/Components/Admin/products/products.component').then(m => m.ProductsComponent) },
+      { path: 'products/new',           loadComponent: () => import('./Core/Components/Admin/products/product-form.component').then(m => m.ProductFormComponent) },
+      { path: 'products/edit/:id',      loadComponent: () => import('./Core/Components/Admin/products/product-form.component').then(m => m.ProductFormComponent) },
+      { path: 'products/references/:productId', loadComponent: () => import('./Core/Components/Admin/products/product-references/product-references.component').then(m => m.ProductReferencesComponent) },
+      { path: 'categories',             loadComponent: () => import('./Core/Components/Admin/categories/categories.component').then(m => m.CategoriesComponent) },
+      { path: 'categories/new',         loadComponent: () => import('./Core/Components/Admin/categories/category-form.component').then(m => m.CategoryFormComponent) },
+      { path: 'categories/edit/:id',    loadComponent: () => import('./Core/Components/Admin/categories/category-form.component').then(m => m.CategoryFormComponent) },
+      { path: 'categories/attributes/:categoryId', loadComponent: () => import('./Core/Components/Admin/categories/category-attributes/category-attributes.component').then(m => m.CategoryAttributesComponent) },
+      { path: 'brands',                 loadComponent: () => import('./Core/Components/Admin/brands/brands.component').then(m => m.BrandsComponent) },
+      { path: 'brands/new',             loadComponent: () => import('./Core/Components/Admin/brands/brand-form.component').then(m => m.BrandFormComponent) },
+      { path: 'brands/edit/:id',        loadComponent: () => import('./Core/Components/Admin/brands/brand-form.component').then(m => m.BrandFormComponent) },
+      { path: 'warehouses',             loadComponent: () => import('./Core/Components/Admin/warehouses/warehouses.component').then(m => m.WarehousesComponent) },
+      { path: 'warehouses/new',         loadComponent: () => import('./Core/Components/Admin/warehouses/warehouse-form.component').then(m => m.WarehouseFormComponent) },
+      { path: 'warehouses/edit/:id',    loadComponent: () => import('./Core/Components/Admin/warehouses/warehouse-form.component').then(m => m.WarehouseFormComponent) },
+      { path: 'inventory',              loadComponent: () => import('./Core/Components/Admin/inventory/inventory.component').then(m => m.InventoryComponent) },
+      { path: 'inventory-entries',      loadComponent: () => import('./Core/Components/Admin/inventory-entries/inventory-entries.component').then(m => m.InventoryEntriesComponent) },
+      { path: 'inventory-exits',        loadComponent: () => import('./Core/Components/Admin/inventory-exits/inventory-exits.component').then(m => m.InventoryExitsComponent) },
+      { path: 'inventory-transfers',    loadComponent: () => import('./Core/Components/Admin/inventory-transfers/inventory-transfers.component').then(m => m.InventoryTransfersComponent) },
+      { path: 'price-lists',            loadComponent: () => import('./Core/Components/Admin/price-lists/price-lists.component').then(m => m.PriceListsComponent) },
+      { path: 'price-lists/new',        loadComponent: () => import('./Core/Components/Admin/price-lists/price-list-form.component').then(m => m.PriceListFormComponent) },
+      { path: 'price-lists/edit/:id',   loadComponent: () => import('./Core/Components/Admin/price-lists/price-list-form.component').then(m => m.PriceListFormComponent) },
+      { path: 'customers',              loadComponent: () => import('./Core/Components/Admin/customers/customers.component').then(m => m.CustomersComponent) },
+      { path: 'customers/new',          loadComponent: () => import('./Core/Components/Admin/customers/customer-form.component').then(m => m.CustomerFormComponent) },
+      { path: 'customers/edit/:id',     loadComponent: () => import('./Core/Components/Admin/customers/customer-form.component').then(m => m.CustomerFormComponent) },
+      { path: 'customer-groups',        loadComponent: () => import('./Core/Components/Admin/customer-groups/customer-groups.component').then(m => m.CustomerGroupsComponent) },
+      { path: 'customer-groups/new',    loadComponent: () => import('./Core/Components/Admin/customer-groups/customer-group-form.component').then(m => m.CustomerGroupFormComponent) },
+      { path: 'customer-groups/edit/:id', loadComponent: () => import('./Core/Components/Admin/customer-groups/customer-group-form.component').then(m => m.CustomerGroupFormComponent) },
+      { path: 'discounts',              loadComponent: () => import('./Core/Components/Admin/discounts/discounts.component').then(m => m.DiscountsComponent) },
+      { path: 'discounts/new',          loadComponent: () => import('./Core/Components/Admin/discounts/discount-form.component').then(m => m.DiscountFormComponent) },
+      { path: 'discounts/edit/:id',     loadComponent: () => import('./Core/Components/Admin/discounts/discount-form.component').then(m => m.DiscountFormComponent) },
+      { path: 'taxes',                  loadComponent: () => import('./Core/Components/Admin/taxes/taxes.component').then(m => m.TaxesComponent) },
+      { path: 'taxes/new',              loadComponent: () => import('./Core/Components/Admin/taxes/tax-form.component').then(m => m.TaxFormComponent) },
+      { path: 'taxes/edit/:id',         loadComponent: () => import('./Core/Components/Admin/taxes/tax-form.component').then(m => m.TaxFormComponent) },
+      { path: 'users',                  loadComponent: () => import('./Core/Components/Admin/users/users.component').then(m => m.UsersComponent) },
+      { path: 'users/new',              loadComponent: () => import('./Core/Components/Admin/users/user-form.component').then(m => m.UserFormComponent) },
+      { path: 'users/edit/:id',         loadComponent: () => import('./Core/Components/Admin/users/user-form.component').then(m => m.UserFormComponent) },
+      { path: 'profiles',               loadComponent: () => import('./Core/Components/Admin/profiles/profiles.component').then(m => m.ProfilesComponent) },
+      { path: 'profiles/new',           loadComponent: () => import('./Core/Components/Admin/profiles/profile-form.component').then(m => m.ProfileFormComponent) },
+      { path: 'profiles/edit/:id',      loadComponent: () => import('./Core/Components/Admin/profiles/profile-form.component').then(m => m.ProfileFormComponent) },
+      { path: 'orders',                 loadComponent: () => import('./Core/Components/Admin/orders/orders.component').then(m => m.OrdersComponent) },
+      { path: 'orders/new',             loadComponent: () => import('./Core/Components/Admin/orders/order-form.component').then(m => m.OrderFormComponent) },
+      { path: 'orders/detail/:id',      loadComponent: () => import('./Core/Components/Admin/orders/order-detail.component').then(m => m.OrderDetailComponent) },
+      { path: 'orders/edit/:id',        loadComponent: () => import('./Core/Components/Admin/orders/order-form.component').then(m => m.OrderFormComponent) },
+      { path: 'contact-messages',       loadComponent: () => import('./Core/Components/Admin/contact-messages/contact-messages.component').then(m => m.ContactMessagesComponent) },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+    ]
+  },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login' }
+];

@@ -1,0 +1,66 @@
+<div class="page-header">
+  <h1>Almacenes</h1>
+  @if (authService.hasPermission('warehouses.create')) {
+    <p-button label="Nuevo Almacén" icon="pi pi-plus" (onClick)="goToNewWarehouse()"></p-button>
+  }
+</div>
+
+<div class="card">
+  <p-table 
+    [value]="warehouses()" 
+    [paginator]="true" 
+    [rows]="pageSize" 
+    [totalRecords]="totalCount()"
+    [loading]="loading()"
+    [lazy]="true" 
+    (onPage)="onPage($event)"
+    [first]="first"
+    [tableStyle]="{'min-width': '60rem'}"
+    styleClass="p-datatable-striped">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon></th>
+        <th pSortableColumn="location">Ubicación <p-sortIcon field="location"></p-sortIcon></th>
+        <th>Principal</th>
+        <th>Estado</th>
+        <th style="width: 8rem">Acciones</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-w>
+      <tr>
+        <td>{{ w.name }}</td>
+        <td>{{ w.location }}</td>
+        <td>
+          <p-tag [value]="w.isMain ? 'Sí' : 'No'" [severity]="getMainSeverity(w.isMain)"></p-tag>
+        </td>
+        <td>
+          <p-tag [value]="w.isActive ? 'Activo' : 'Inactivo'" [severity]="getActiveSeverity(w.isActive)"></p-tag>
+        </td>
+        <td>
+          @if (authService.hasPermission('warehouses.update')) {
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" (onClick)="goToEditWarehouse(w)"></p-button>
+          }
+          @if (authService.hasPermission('warehouses.delete')) {
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteWarehouse(w)"></p-button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center">
+          <div class="empty-state">
+            <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No hay almacenes registrados</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

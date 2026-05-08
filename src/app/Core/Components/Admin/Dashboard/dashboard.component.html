@@ -1,0 +1,50 @@
+<h1>Dashboard</h1>
+<div class="stats-grid">
+  <p-card styleClass="stat-card">
+    <ng-template pTemplate="content">
+      <div class="stat-content">
+        <i class="pi pi-box stat-icon products"></i>
+        <div class="stat-info">
+          <h3>{{ stats().products }}</h3>
+          <p>Productos</p>
+        </div>
+      </div>
+    </ng-template>
+  </p-card>
+  
+  <p-card styleClass="stat-card">
+    <ng-template pTemplate="content">
+      <div class="stat-content">
+        <i class="pi pi-building stat-icon warehouses"></i>
+        <div class="stat-info">
+          <h3>{{ stats().warehouses }}</h3>
+          <p>Almacenes</p>
+        </div>
+      </div>
+    </ng-template>
+  </p-card>
+  
+  <p-card styleClass="stat-card">
+    <ng-template pTemplate="content">
+      <div class="stat-content">
+        <i class="pi pi-users stat-icon customers"></i>
+        <div class="stat-info">
+          <h3>{{ stats().customers }}</h3>
+          <p>Clientes</p>
+        </div>
+      </div>
+    </ng-template>
+  </p-card>
+  
+  <p-card styleClass="stat-card">
+    <ng-template pTemplate="content">
+      <div class="stat-content">
+        <i class="pi pi-shopping-cart stat-icon orders"></i>
+        <div class="stat-info">
+          <h3>{{ stats().orders }}</h3>
+          <p>Pedidos</p>
+        </div>
+      </div>
+    </ng-template>
+  </p-card>
+</div>

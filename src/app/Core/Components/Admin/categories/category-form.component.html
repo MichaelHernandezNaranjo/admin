@@ -1,0 +1,64 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingCategory() ? 'Editar' : 'Nueva' }} Categoría</h1>
+  </div>
+</div>
+
+<div class="card">
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Datos Generales</p-tab>
+      <p-tab *ngIf="editingCategory()" value="1">Atributos</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      <p-tabpanel value="0">
+          <div class="form-card">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="name">Nombre</label>
+              <input 
+                pInputText 
+                id="name" 
+                [(ngModel)]="formData.name" 
+                placeholder="Nombre de la categoría"
+                class="w-full"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="isActive">Activo</label>
+              <p-checkbox 
+                [(ngModel)]="formData.isActive" 
+                [binary]="true"
+                inputId="isActive"
+              ></p-checkbox>
+            </div>
+
+            <div class="form-field full-width">
+              <label for="description">Descripción</label>
+              <textarea 
+                pInputTextarea 
+                id="description" 
+                [(ngModel)]="formData.description" 
+                [rows]="3"
+                placeholder="Descripción de la categoría"
+                class="w-full"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+            <p-button label="Guardar" icon="pi pi-check" [loading]="isLoading()" (onClick)="saveCategory()"></p-button>
+          </div>
+        </div>
+      </p-tabpanel>
+      <p-tabpanel *ngIf="editingCategory()" value="1">
+        <app-category-attributes [categoryId]="editingCategory()!.id"></app-category-attributes>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>
+
+<p-toast></p-toast>

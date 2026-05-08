@@ -1,0 +1,64 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingCustomer() ? 'Editar' : 'Nuevo' }} Cliente</h1>
+  </div>
+</div>
+
+<div class="card form-card">
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input 
+        pInputText 
+        id="email" 
+        type="email"
+        [(ngModel)]="formData.email" 
+        placeholder="Email del cliente"
+        class="w-full"
+      />
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label for="firstName">Nombre</label>
+        <input 
+          pInputText 
+          id="firstName" 
+          [(ngModel)]="formData.firstName" 
+          placeholder="Nombre"
+          class="w-full"
+        />
+      </div>
+
+      <div class="form-field">
+        <label for="lastName">Apellido</label>
+        <input 
+          pInputText 
+          id="lastName" 
+          [(ngModel)]="formData.lastName" 
+          placeholder="Apellido"
+          class="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="phone">Teléfono</label>
+      <input 
+        pInputText 
+        id="phone" 
+        [(ngModel)]="formData.phone" 
+        placeholder="Teléfono"
+        class="w-full"
+      />
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" [loading]="isLoading()" (onClick)="saveCustomer()"></p-button>
+  </div>
+</div>
+
+<p-toast></p-toast>

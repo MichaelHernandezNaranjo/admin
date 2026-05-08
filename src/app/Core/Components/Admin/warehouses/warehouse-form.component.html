@@ -1,0 +1,49 @@
+<div class="page-header">
+  <div class="header-left">
+    <p-button icon="pi pi-arrow-left" [text]="true" (onClick)="goBack()"></p-button>
+    <h1>{{ editingWarehouse() ? 'Editar' : 'Nuevo' }} Almacén</h1>
+  </div>
+</div>
+
+<div class="card form-card">
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="name">Nombre</label>
+      <input 
+        pInputText 
+        id="name" 
+        [(ngModel)]="formData.name" 
+        placeholder="Nombre del almacén"
+        class="w-full"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="location">Ubicación</label>
+      <input 
+        pInputText 
+        id="location" 
+        [(ngModel)]="formData.location" 
+        placeholder="Ubicación del almacén"
+        class="w-full"
+      />
+    </div>
+
+    <div class="form-field full-width checkbox-field">
+      <p-checkbox [(ngModel)]="formData.isMain" [binary]="true" inputId="isMain"></p-checkbox>
+      <label for="isMain">Almacén Principal</label>
+    </div>
+
+    <div class="form-field full-width checkbox-field">
+      <p-checkbox [(ngModel)]="formData.isActive" [binary]="true" inputId="isActive"></p-checkbox>
+      <label for="isActive">Activo</label>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="goBack()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" [loading]="isLoading()" (onClick)="saveWarehouse()"></p-button>
+  </div>
+</div>
+
+<p-toast></p-toast>

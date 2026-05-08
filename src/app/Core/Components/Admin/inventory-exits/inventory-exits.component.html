@@ -1,0 +1,110 @@
+<div class="page-header">
+  <h1>Salida de Mercancía</h1>
+  @if (authService.hasPermission('inventory.exits.create')) {
+    <p-button label="Nueva Salida" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
+  }
+</div>
+
+<p-table [value]="exits()" [paginator]="true" [rows]="pageSize" [totalRecords]="totalCount()"
+  [lazy]="true" (onPage)="onPageChange($event)" [tableStyle]="{ 'min-width': '60rem' }"
+  styleClass="p-datatable-striped">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Nro. Ref</th>
+      <th>Producto</th>
+      <th>SKU/Referencia</th>
+      <th>Bodega</th>
+      <th>Cantidad</th>
+      <th>Motivo</th>
+      <th>Fecha</th>
+      <th style="width: 80px">Acciones</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-e>
+    <tr>
+      <td>{{ e.reference || 'N/A' }}</td>
+      <td>{{ e.product?.name || 'N/A' }}</td>
+      <td>{{ e.productReference?.referenceCode || '-' }}</td>
+      <td>{{ e.warehouse?.name || 'N/A' }}</td>
+      <td>{{ e.quantity }}</td>
+      <td>{{ e.reason }}</td>
+      <td>{{ e.createdAt | date:'short' }}</td>
+      <td>
+        @if (authService.hasPermission('inventory.exits.delete')) {
+          <p-button icon="pi pi-trash" [text]="true" severity="danger" pTooltip="Eliminar" (onClick)="deleteExit(e.id)"></p-button>
+        }
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="8" class="text-center">No hay salidas de mercancía</td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-dialog header="Nueva Salida de Mercancía" [(visible)]="showDialog" [modal]="true" 
+  [style]="{ width: '600px' }" [draggable]="false">
+  <div class="form-grid">
+    <div class="form-row">
+      <div class="form-field">
+        <label for="product">Producto *</label>
+        <p-select [(ngModel)]="formData.productId" [options]="products()" optionLabel="name" optionValue="id" 
+          placeholder="Seleccionar producto" [filter]="true" filterBy="name,productCode" styleClass="w-full"
+          (onChange)="onProductChange($event.value)">
+          <ng-template pTemplate="item" let-p>{{ p.name }} ({{ p.productCode }})</ng-template>
+        </p-select>
+      </div>
+      <div class="form-field">
+        <label for="reference">Referencia (Opcional)</label>
+        <p-select [(ngModel)]="formData.productReferenceId" [options]="productReferences()" 
+          optionLabel="referenceCode" optionValue="id" 
+          placeholder="Seleccionar referencia" styleClass="w-full"
+          [disabled]="!formData.productId || productReferences().length === 0">
+          <ng-template pTemplate="item" let-r>
+            {{ r.referenceCode }}
+            @if (r.attributeValues && r.attributeValues.length > 0) {
+              <span class="text-sm text-gray-500">
+                ({{ getAttributeDisplay(r) }})
+              </span>
+            }
+          </ng-template>
+        </p-select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label for="warehouse">Bodega *</label>
+        <p-select [(ngModel)]="formData.warehouseId" [options]="warehouses()" optionLabel="name" optionValue="id" 
+          placeholder="Seleccionar bodega" styleClass="w-full"></p-select>
+      </div>
+      <div class="form-field">
+        <label for="quantity">Cantidad *</label>
+        <p-inputNumber [(ngModel)]="formData.quantity" [min]="1" styleClass="w-full"></p-inputNumber>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label for="reason">Motivo *</label>
+        <p-select [(ngModel)]="formData.reason" [options]="reasons" placeholder="Seleccionar motivo" styleClass="w-full"></p-select>
+      </div>
+      <div class="form-field">
+        <label for="reference">Nro. Orden/Referencia</label>
+        <input pInputText [(ngModel)]="formData.reference" placeholder="Número de orden o referencia" class="w-full" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field full">
+        <label for="notes">Notas</label>
+        <textarea pInputTextarea [(ngModel)]="formData.notes" [rows]="2" class="w-full"></textarea>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="closeDialog()"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" (onClick)="saveExit()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>
