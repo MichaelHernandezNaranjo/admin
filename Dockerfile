@@ -16,7 +16,7 @@ FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy built Angular app
-COPY --from=builder /app/dist/admin-app/browser /usr/share/nginx/html
+COPY --from=builder /app/dist/AdminApp/browser /usr/share/nginx/html
 
 # Nginx config for Angular routing (HTML5 pushState)
 RUN printf 'server {\n\
