@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "AdminApp": {
+    "d4nthi-admin": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {

@@ -1,5 +1,5 @@
 {
-  "name": "admin-app",
+  "name": "d4nthi-admin",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng --port 4201",

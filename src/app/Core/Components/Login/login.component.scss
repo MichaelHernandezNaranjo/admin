@@ -48,14 +48,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
-  font-size: 1.8rem;
-  font-weight: 900;
-  letter-spacing: -0.03em;
 }
 
-.logo-force { color: #ffffff; }
-.logo-store { color: #ef4444; }
+.login-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
 
 .login-form {
   padding-top: 1rem;
