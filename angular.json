@@ -90,10 +90,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "AdminApp:build:production"
+              "buildTarget": "d4nthi-admin:build:production"
             },
             "development": {
-              "buildTarget": "AdminApp:build:development"
+              "buildTarget": "d4nthi-admin:build:development"
             }
           },
           "defaultConfiguration": "development"
