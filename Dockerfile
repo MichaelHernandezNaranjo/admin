@@ -34,4 +34,7 @@ RUN printf 'server {\n\
 
 EXPOSE 4201
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -qO- http://localhost:4201/ || exit 1
+
 CMD ["nginx", "-g", "daemon off;"]
