@@ -142,13 +142,13 @@
                   }
                 </td>
                 <td style="text-align:center">{{ item.quantity }}</td>
-                <td style="text-align:right">{{ item.unitPrice | currency:'COP':'symbol':'1.0-0' }}</td>
+                <td style="text-align:right">{{ item.unitPrice | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                 <td style="text-align:right">
                   @if (item.discount > 0) {
-                    <span class="od-discount">-{{ item.discount | currency:'COP':'symbol':'1.0-0' }}</span>
+                    <span class="od-discount">-{{ item.discount | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
                   } @else { — }
                 </td>
-                <td style="text-align:right"><strong>{{ item.total | currency:'COP':'symbol':'1.0-0' }}</strong></td>
+                <td style="text-align:right"><strong>{{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}</strong></td>
               </tr>
             }
           </tbody>
@@ -158,7 +158,7 @@
           @if (order()!.discountAmount > 0) {
             <div class="od-total-row">
               <span>Descuentos</span>
-              <span class="od-discount">-{{ order()!.discountAmount | currency:'COP':'symbol':'1.0-0' }}</span>
+              <span class="od-discount">-{{ order()!.discountAmount | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
           }
           <div class="od-total-row">
@@ -166,7 +166,7 @@
           </div>
           <div class="od-total-row od-total-final">
             <span>Total</span>
-            <span>{{ order()!.total | currency:'COP':'symbol':'1.0-0' }}</span>
+            <span>{{ order()!.total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
         </div>
       </div>

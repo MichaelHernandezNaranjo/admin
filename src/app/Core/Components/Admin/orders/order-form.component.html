@@ -105,7 +105,7 @@
                         {{ getAttributeDisplay(ref) }}
                       </span>
                     }
-                    <span class="price">{{ ref.price | currency:'MXN' }}</span>
+                    <span class="price">{{ ref.price | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
                   </div>
                 </div>
               </ng-template>
@@ -172,16 +172,16 @@
             <td>{{ item.quantity }}</td>
             <td>
               @if (item.discount > 0) {
-                <span class="price-original">{{ item.unitPrice | currency:'COP' }}</span>
-                <span class="price-discounted">{{ item.discountedUnitPrice | currency:'COP' }}</span>
+                <span class="price-original">{{ item.unitPrice | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                <span class="price-discounted">{{ item.discountedUnitPrice | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
               } @else {
-                {{ item.unitPrice | currency:'COP' }}
+                {{ item.unitPrice | currency:'COP':'symbol-narrow':'1.0-0' }}
               }
             </td>
             <td>
               @if (item.discount > 0) {
                 <span class="discount-cell">
-                  -{{ item.discount | currency:'COP' }}
+                  -{{ item.discount | currency:'COP':'symbol-narrow':'1.0-0' }}
                   @if (item.discountName) {
                     <br><small>{{ item.discountName }}</small>
                   }
@@ -190,7 +190,7 @@
                 <span style="color:#555">—</span>
               }
             </td>
-            <td>{{ item.total | currency:'COP' }}</td>
+            <td>{{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
             @if (!editingOrder()) {
               <td>
                 <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="removeItem(i)"></p-button>
@@ -201,24 +201,24 @@
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="6" class="text-right"><strong>Subtotal:</strong></td>
-            <td>{{ getSubtotal() | currency:'COP' }}</td>
+            <td>{{ getSubtotal() | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
             @if (!editingOrder()) { <td></td> }
           </tr>
           @if (getDiscountTotal() > 0) {
             <tr>
               <td colspan="6" class="text-right" style="color:#ef4444"><strong>Descuentos:</strong></td>
-              <td style="color:#ef4444">-{{ getDiscountTotal() | currency:'COP' }}</td>
+              <td style="color:#ef4444">-{{ getDiscountTotal() | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
               @if (!editingOrder()) { <td></td> }
             </tr>
           }
           <tr>
             <td colspan="6" class="text-right"><strong>IVA (16%):</strong></td>
-            <td>{{ getTaxAmount() | currency:'COP' }}</td>
+            <td>{{ getTaxAmount() | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
             @if (!editingOrder()) { <td></td> }
           </tr>
           <tr>
             <td colspan="6" class="text-right"><strong>Total:</strong></td>
-            <td><strong>{{ getTotal() | currency:'COP' }}</strong></td>
+            <td><strong>{{ getTotal() | currency:'COP':'symbol-narrow':'1.0-0' }}</strong></td>
             @if (!editingOrder()) { <td></td> }
           </tr>
         </ng-template>

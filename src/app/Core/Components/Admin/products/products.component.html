@@ -97,10 +97,10 @@
         <!-- Precio -->
         <td class="price-cell">
           @if (product.discountedPrice && product.discountedPrice < product.price) {
-            <span class="price-original">{{ product.price | currency:'MXN':'symbol':'1.0-0' }}</span>
-            <span class="price-discounted">{{ product.discountedPrice | currency:'MXN':'symbol':'1.0-0' }}</span>
+            <span class="price-original">{{ product.price | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            <span class="price-discounted">{{ product.discountedPrice | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           } @else {
-            <span class="price-normal">{{ product.price | currency:'MXN':'symbol':'1.0-0' }}</span>
+            <span class="price-normal">{{ product.price | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           }
         </td>
 

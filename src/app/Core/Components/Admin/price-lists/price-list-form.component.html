@@ -93,8 +93,8 @@
                     <span class="text-muted">-</span>
                   }
                 </td>
-                <td>{{ item.basePrice | currency:'MXN' }}</td>
-                <td><strong>{{ item.price | currency:'MXN' }}</strong></td>
+                <td>{{ item.basePrice | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td><strong>{{ item.price | currency:'COP':'symbol-narrow':'1.0-0' }}</strong></td>
                 <td>
                   <p-button 
                     icon="pi pi-trash" 
@@ -149,7 +149,7 @@
                   {{ getAttributeDisplay(ref) }}
                 </span>
               }
-              <span class="price">{{ ref.price | currency:'MXN' }}</span>
+              <span class="price">{{ ref.price | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
           </div>
         </ng-template>
@@ -161,8 +161,10 @@
       <p-inputNumber 
         [(ngModel)]="newProductPrice" 
         mode="currency" 
-        currency="MXN" 
-        locale="es-MX"
+        currency="COP" 
+        locale="es-CO"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="0"
         [min]="0"
         placeholder="Precio"
         styleClass="w-full">

@@ -50,7 +50,7 @@
               </div>
             </td>
             <td>
-              {{ reference.price | currency:'USD':'symbol':'1.2-2' }}
+              {{ reference.price | currency:'COP':'symbol-narrow':'1.0-0' }}
             </td>
             <td>
               @if (reference.inventory) {
@@ -143,9 +143,10 @@
           id="price"
           [(ngModel)]="referenceForm.price" 
           mode="currency" 
-          currency="USD"
-          [minFractionDigits]="2"
-          [maxFractionDigits]="2"
+          currency="COP"
+          locale="es-CO"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="0"
           class="w-full">
         </p-inputNumber>
       </div>
