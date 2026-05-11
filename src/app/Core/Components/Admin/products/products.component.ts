@@ -77,7 +77,7 @@ export class ProductsComponent implements OnInit {
       this.loadSubscription.unsubscribe();
     }
     
-    this.loadSubscription = this.apiService.getProducts(page, this.rows, this.sortField, this.sortOrder, this.searchTerm).subscribe({
+    this.loadSubscription = this.apiService.getProducts(page, this.rows, this.sortField, this.sortOrder, this.searchTerm, { onlyActive: false }).subscribe({
       next: (res) => {
         this.products.set(res.data);
         this.totalRecords.set(res.total ?? 0);
