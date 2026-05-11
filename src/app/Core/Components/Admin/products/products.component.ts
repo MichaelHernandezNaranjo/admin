@@ -16,6 +16,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ApiService, AuthService } from '../../../Services';
 import { Product } from '../../../Models';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-products',
@@ -39,6 +40,8 @@ import { Product } from '../../../Models';
   styleUrl: './products.component.scss'
 })
 export class ProductsComponent implements OnInit {
+  readonly BACKEND_URL = environment.backendUrl;
+
   products = signal<Product[]>([]);
   totalRecords = signal(0);
   loading = signal(false);
@@ -147,5 +150,11 @@ export class ProductsComponent implements OnInit {
     } catch {
       return [];
     }
+  }
+
+  getImage(imageUrl: string | null | undefined): string {
+    if (!imageUrl) return '';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    return `${this.BACKEND_URL}${imageUrl}`;
   }
 }

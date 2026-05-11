@@ -58,8 +58,8 @@
       <tr class="product-row">
         <!-- Imagen -->
         <td class="img-cell">
-          @if (product.imageUrl) {
-            <img [src]="product.imageUrl" [alt]="product.name" class="product-thumb" />
+          @if (getImage(product.imageUrl)) {
+            <img [src]="getImage(product.imageUrl)" [alt]="product.name" class="product-thumb" />
           } @else {
             <div class="product-thumb-placeholder">
               <i class="pi pi-image"></i>
