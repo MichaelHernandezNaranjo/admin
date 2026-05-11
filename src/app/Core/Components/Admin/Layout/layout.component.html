@@ -1,12 +1,25 @@
-<div class="layout-wrapper">
-  <div class="sidebar">
+<div class="layout-wrapper" [class.sidebar-collapsed]="sidebarCollapsed()">
+  <!-- Mobile Overlay -->
+  @if (mobileMenuOpen()) {
+    <div class="mobile-overlay" (click)="closeMobileMenu()"></div>
+  }
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.mobile-open]="mobileMenuOpen()">
     <div class="sidebar-inner">
+      <!-- Logo Section -->
       <div class="logo-section">
-        <a routerLink="/" class="logo-link">
-          <img src="/logo.png" alt="d4nthi" class="sidebar-logo" />
-        </a>
+        <button class="collapse-btn" (click)="toggleSidebar()">
+          <i class="pi" [class.pi-bars]="!sidebarCollapsed()" [class.pi-bars]="sidebarCollapsed()"></i>
+        </button>
+        @if (!sidebarCollapsed()) {
+          <a routerLink="/admin/dashboard" class="logo-link">
+            <img src="/logo.png" alt="d4nthi" class="sidebar-logo" />
+          </a>
+        }
       </div>
-      
+
+      <!-- Menu -->
       <p-virtualscroller [items]="menuItems()" [itemSize]="40" scrollHeight="calc(100vh - 160px)" styleClass="menu-scroller">
         <ng-template #item let-item let-options="options">
           @if (item.type === 'header') {
@@ -14,35 +27,52 @@
           }
           @if (item.type === 'item') {
             <a pRipple [routerLink]="item.routerLink" class="menu-item-link" routerLinkActive="active-link">
-              <span [class]="item.icon"></span>
-              <span class="ms-2">{{ item.label }}</span>
+              <span [class]="item.icon" class="menu-icon"></span>
+              @if (!sidebarCollapsed()) {
+                <span class="menu-label">{{ item.label }}</span>
+              }
             </a>
           }
-          @if (item.type === 'separator') {
+          <!-- @if (item.type === 'separator') {
             <div class="menu-separator"></div>
-          }
+          } -->
         </ng-template>
       </p-virtualscroller>
-      
+
+      <!-- User Footer -->
       <div class="menu-footer">
         <button pRipple class="user-button" (click)="logout()">
-          <p-avatar [label]="getUserAvatar()" shape="circle"></p-avatar>
-          <span class="user-info-text">
-            <span class="font-bold">{{ getUserName() }}</span>
-            <span class="text-sm">{{ getUserRole() }}</span>
-          </span>
+          <p-avatar [label]="getUserAvatar()" shape="circle" size="normal"></p-avatar>
+          @if (!sidebarCollapsed()) {
+            <span class="user-info-text">
+              <span class="user-name">{{ getUserName() }}</span>
+              <span class="user-role">{{ getUserRole() }}</span>
+            </span>
+          }
         </button>
       </div>
     </div>
-  </div>
+  </aside>
 
+  <!-- Main Content -->
   <div class="main-content">
+    <!-- Topbar -->
     <header class="topbar">
       <div class="topbar-left">
+        <button class="mobile-toggle" (click)="toggleSidebar()">
+          <i class="pi pi-bars"></i>
+        </button>
+        <app-breadcrumb [items]="breadcrumbItems()"></app-breadcrumb>
         <span class="page-title">{{ currentSection() }}</span>
       </div>
+      <div class="topbar-right">
+        <button pButton class="p-button-text topbar-action-btn" (click)="logout()">
+          <i class="pi pi-sign-out"></i>
+        </button>
+      </div>
     </header>
-    
+
+    <!-- Page Content -->
     <main class="page-content">
       <router-outlet></router-outlet>
     </main>

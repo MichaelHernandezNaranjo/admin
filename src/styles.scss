@@ -16,9 +16,10 @@
 
   /* Surfaces — dark theme */
   --surface-ground: #0f0f0f;
-  --surface-card: #1a1a1a;
-  --surface-50: #1f1f1f;
-  --surface-100: #222222;
+  --surface-card: #141414;
+  --surface-50: #1a1a1a;
+  --surface-100: #1f1f1f;
+  --surface-200: #252525;
   --surface-border: rgba(255, 255, 255, 0.08);
   --surface-hover: rgba(255, 255, 255, 0.06);
 
@@ -55,35 +56,86 @@ html, body {
   color: var(--text-color);
 }
 
+/* Custom Dark Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+  border: 1px solid #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}
+
+::-webkit-scrollbar-corner {
+  background: #0a0a0a;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #333333 #0a0a0a;
+}
+
 .p-component {
   font-family: inherit;
 }
 
-/* PrimeNG dark theme overrides */
+/* Card styling - more structure */
 .p-card {
   background: var(--surface-card) !important;
   color: var(--text-color) !important;
   border: 1px solid var(--surface-border) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 12px !important;
 }
 
+/* Enhanced Table Styling */
 .p-datatable {
   .p-datatable-thead > tr > th {
-    background: var(--surface-100) !important;
-    color: var(--text-color-secondary) !important;
+    background: var(--surface-50) !important;
+    color: var(--text-muted-color) !important;
     border-color: var(--surface-border) !important;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.875rem 1rem !important;
   }
   .p-datatable-tbody > tr {
     background: var(--surface-card) !important;
     color: var(--text-color) !important;
     border-color: var(--surface-border) !important;
+    transition: all 0.15s;
+
     &:hover {
       background: var(--surface-hover) !important;
     }
+
+    > td {
+      padding: 0.75rem 1rem !important;
+      border-color: var(--surface-border) !important;
+    }
   }
   .p-datatable-tfoot > tr > td {
-    background: var(--surface-100) !important;
+    background: var(--surface-50) !important;
     border-color: var(--surface-border) !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  // Striped rows
+  &.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02) !important;
   }
 }
 
@@ -101,10 +153,41 @@ html, body {
 }
 
 // InputGroup addon (icono de búsqueda, etc.)
+.p-inputgroup {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .p-inputgroup-addon {
   background: var(--surface-100) !important;
   border-color: var(--surface-border) !important;
   color: var(--text-color-secondary) !important;
+  padding: 0.5rem 0.75rem !important;
+
+  &:first-child {
+    border-radius: 8px 0 0 8px;
+  }
+
+  &:last-child {
+    border-radius: 0 8px 8px 0;
+  }
+
+  i {
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+  }
+}
+
+.p-inputgroup .p-inputtext {
+  border-radius: 0 8px 8px 0;
+
+  &:first-child {
+    border-radius: 8px 0 0 8px;
+  }
+
+  &:last-child {
+    border-radius: 0 8px 8px 0;
+  }
 }
 
 // InputNumber horizontal buttons (+ / -)
@@ -399,6 +482,90 @@ html, body {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   padding: 1.5rem;
+}
+
+/* Toolbar styling - consistent across all pages */
+.p-toolbar {
+  background: var(--surface-card) !important;
+  border: 1px solid var(--surface-border) !important;
+  border-radius: 10px !important;
+  padding: 1rem 1.25rem !important;
+  box-shadow: none !important;
+}
+
+.page-toolbar {
+  margin-bottom: 1.5rem;
+}
+
+.toolbar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  i {
+    font-size: 1.25rem;
+    color: var(--p-primary-color);
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+
+  .p-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+}
+
+/* Enhanced filter bar */
+.filters-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+
+  .search-input {
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+}
+
+/* Page header with breadcrumb support */
+.page-header-with-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-color);
+    }
+  }
+
+  .header-right {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
 }
 
 .page-header {

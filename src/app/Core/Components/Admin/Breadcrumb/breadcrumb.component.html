@@ -1,0 +1,19 @@
+<nav class="breadcrumb-nav">
+  <ol class="breadcrumb-list">
+    <li class="breadcrumb-item">
+      <a routerLink="/admin/dashboard" class="breadcrumb-link home-link">
+        <i class="pi pi-home"></i>
+      </a>
+    </li>
+    @for (item of items; track item.label; let last = $last; let i = $index) {
+      <li class="breadcrumb-item">
+        <span class="breadcrumb-separator">/</span>
+        @if (item.routerLink && !last) {
+          <a [routerLink]="item.routerLink" class="breadcrumb-link">{{ item.label }}</a>
+        } @else {
+          <span class="breadcrumb-current" [class.is-last]="last">{{ item.label }}</span>
+        }
+      </li>
+    }
+  </ol>
+</nav>
