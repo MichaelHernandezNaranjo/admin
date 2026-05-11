@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
+import { ToolbarModule } from 'primeng/toolbar';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -18,6 +19,7 @@ import { Profile } from '../../../Models';
     TableModule,
     ButtonModule,
     TagModule,
+    ToolbarModule,
     ToastModule,
     ConfirmDialogModule
   ],

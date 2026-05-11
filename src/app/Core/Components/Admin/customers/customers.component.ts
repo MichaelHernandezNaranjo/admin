@@ -1,11 +1,15 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
+import { ToolbarModule } from 'primeng/toolbar';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { PaginatorModule } from 'primeng/paginator';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ApiService, AuthService } from '../../../Services';
 import { Customer } from '../../../Models';
@@ -13,13 +17,17 @@ import { Customer } from '../../../Models';
 @Component({
   selector: 'app-customers',
   standalone: true,
-  imports: [
+imports: [
     CommonModule,
+    FormsModule,
     TableModule,
     ButtonModule,
     TagModule,
+    ToolbarModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    InputTextModule,
+    PaginatorModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './customers.component.html',

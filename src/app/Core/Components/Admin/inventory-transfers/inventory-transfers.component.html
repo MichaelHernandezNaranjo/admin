@@ -1,9 +1,17 @@
-<div class="page-header">
-  <h1>Traslados de Mercancía</h1>
-  @if (authService.hasPermission('inventory.transfers.create')) {
-    <p-button label="Nuevo Traslado" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
-  }
-</div>
+<p-toolbar styleClass="page-toolbar">
+  <ng-template pTemplate="start">
+    <div class="toolbar-title">
+      <i class="pi pi-arrows-h"></i>
+      <h2>Traslados de Mercancía</h2>
+      <p-tag [value]="totalCount() + ' traslados'" severity="secondary"></p-tag>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    @if (authService.hasPermission('inventory.transfers.create')) {
+      <p-button label="Nuevo Traslado" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
+    }
+  </ng-template>
+</p-toolbar>
 
 <p-table [value]="transfers()" [paginator]="true" [rows]="pageSize" [totalRecords]="totalCount()"
   [lazy]="true" (onPage)="onPageChange($event)" [tableStyle]="{ 'min-width': '60rem' }"

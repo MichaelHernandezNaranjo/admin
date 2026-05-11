@@ -1,9 +1,17 @@
-<div class="page-header">
-  <h1>Descuentos</h1>
-  @if (authService.hasPermission('discounts.create')) {
-    <p-button label="Nuevo Descuento" icon="pi pi-plus" (onClick)="goToNewDiscount()"></p-button>
-  }
-</div>
+<p-toolbar styleClass="page-toolbar">
+  <ng-template pTemplate="start">
+    <div class="toolbar-title">
+      <i class="pi pi-percent"></i>
+      <h2>Descuentos</h2>
+      <p-tag [value]="totalCount() + ' descuentos'" severity="secondary"></p-tag>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    @if (authService.hasPermission('discounts.create')) {
+      <p-button label="Nuevo Descuento" icon="pi pi-plus" (onClick)="goToNewDiscount()"></p-button>
+    }
+  </ng-template>
+</p-toolbar>
 
 <div class="card">
   <p-table

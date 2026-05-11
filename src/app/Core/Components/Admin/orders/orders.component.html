@@ -1,12 +1,10 @@
-<p-toolbar>
+<p-toolbar styleClass="page-toolbar">
   <ng-template pTemplate="start">
-    <div style="display:flex;align-items:center;gap:0.75rem">
-      <h2 style="margin:0">Pedidos</h2>
+    <div class="toolbar-title">
+      <i class="pi pi-shopping-cart"></i>
+      <h2>Pedidos</h2>
       @if (pendingCount() > 0) {
-        <span style="background:var(--p-orange-500);color:#fff;font-size:0.72rem;font-weight:800;
-                     padding:0.2rem 0.65rem;border-radius:12px;letter-spacing:0.04em">
-          {{ pendingCount() }} pendiente{{ pendingCount() === 1 ? '' : 's' }}
-        </span>
+        <p-tag [value]="pendingCount() + ' pendiente' + (pendingCount() === 1 ? '' : 's')" severity="warn"></p-tag>
       }
     </div>
   </ng-template>

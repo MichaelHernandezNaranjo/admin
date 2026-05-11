@@ -1,9 +1,17 @@
-<div class="page-header">
-  <h1>Salida de Mercancía</h1>
-  @if (authService.hasPermission('inventory.exits.create')) {
-    <p-button label="Nueva Salida" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
-  }
-</div>
+<p-toolbar styleClass="page-toolbar">
+  <ng-template pTemplate="start">
+    <div class="toolbar-title">
+      <i class="pi pi-minus-circle"></i>
+      <h2>Salida de Mercancía</h2>
+      <p-tag [value]="totalCount() + ' salidas'" severity="secondary"></p-tag>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    @if (authService.hasPermission('inventory.exits.create')) {
+      <p-button label="Nueva Salida" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
+    }
+  </ng-template>
+</p-toolbar>
 
 <p-table [value]="exits()" [paginator]="true" [rows]="pageSize" [totalRecords]="totalCount()"
   [lazy]="true" (onPage)="onPageChange($event)" [tableStyle]="{ 'min-width': '60rem' }"

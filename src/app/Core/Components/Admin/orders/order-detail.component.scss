@@ -1,10 +1,9 @@
-$border: var(--p-content-border-color);
-$surface: var(--p-content-background);
-$surface2: var(--p-surface-50);
-$text: var(--p-text-color);
-$muted: var(--p-text-muted-color);
-$primary: var(--p-primary-500);
+$border: var(--surface-border);
+$surface: var(--surface-card);
+$surface2: var(--surface-50);
+$muted: var(--text-muted-color);
 $radius: 10px;
+$primary: var(--p-primary-color);
 
 .od-loading, .od-empty {
   display: flex; align-items: center; gap: 0.75rem;
@@ -88,8 +87,10 @@ $radius: 10px;
 
 // ─── Card ──────────────────────────────────────────────────────────
 .od-card {
-  background: $surface; border: 1px solid $border;
-  border-radius: $radius; padding: 1.25rem;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 1.25rem;
 }
 
 .od-card-title {
@@ -152,7 +153,7 @@ $radius: 10px;
 .od-item-attrs { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.35rem; }
 
 .od-attr-chip {
-  font-size: 0.7rem; background: var(--p-surface-100);
+  font-size: 0.7rem; background: var(--surface-100);
   border: 1px solid $border; border-radius: 12px;
   padding: 0.15rem 0.5rem; color: $muted;
 }

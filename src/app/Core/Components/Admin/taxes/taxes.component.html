@@ -1,9 +1,17 @@
-<div class="page-header">
-  <h1>Impuestos</h1>
-  @if (authService.hasPermission('taxes.create')) {
-    <p-button label="Nuevo Impuesto" icon="pi pi-plus" (onClick)="goToNewTax()"></p-button>
-  }
-</div>
+<p-toolbar styleClass="page-toolbar">
+  <ng-template pTemplate="start">
+    <div class="toolbar-title">
+      <i class="pi pi-receipt"></i>
+      <h2>Impuestos</h2>
+      <p-tag [value]="totalCount() + ' impuestos'" severity="secondary"></p-tag>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    @if (authService.hasPermission('taxes.create')) {
+      <p-button label="Nuevo Impuesto" icon="pi pi-plus" (onClick)="goToNewTax()"></p-button>
+    }
+  </ng-template>
+</p-toolbar>
 
 <div class="card">
   <p-table 

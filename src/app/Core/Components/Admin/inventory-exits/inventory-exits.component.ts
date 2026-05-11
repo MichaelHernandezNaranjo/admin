@@ -11,6 +11,8 @@ import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
+import { TagModule } from 'primeng/tag';
+import { ToolbarModule } from 'primeng/toolbar';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ApiService, AuthService } from '../../../Services';
@@ -46,6 +48,8 @@ interface InventoryExit {
     DialogModule,
     ToastModule,
     TooltipModule,
+    TagModule,
+    ToolbarModule,
     ConfirmDialogModule
   ],
   providers: [MessageService, ConfirmationService],

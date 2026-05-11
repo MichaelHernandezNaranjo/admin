@@ -1,14 +1,19 @@
 <p-toast />
 
-<div class="page-header">
-  <div>
-    <h2>Mensajes de contacto</h2>
-    <span *ngIf="unreadCount() > 0" class="unread-badge">{{ unreadCount() }} sin leer</span>
-  </div>
-  <button pButton label="Marcar todos como leídos" icon="pi pi-check-square"
-          severity="secondary" (click)="markAllRead()"
-          [disabled]="unreadCount() === 0"></button>
-</div>
+<p-toolbar styleClass="page-toolbar">
+  <ng-template pTemplate="start">
+    <div class="toolbar-title">
+      <i class="pi pi-envelope"></i>
+      <h2>Mensajes de contacto</h2>
+      @if (unreadCount() > 0) {
+        <p-tag [value]="unreadCount() + ' sin leer'" severity="warn"></p-tag>
+      }
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <p-button label="Marcar todos como leídos" icon="pi pi-check-square" severity="secondary" (onClick)="markAllRead()" [disabled]="unreadCount() === 0"></p-button>
+  </ng-template>
+</p-toolbar>
 
 <p-table
   [value]="messages()"

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
+import { ToolbarModule } from 'primeng/toolbar';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ApiService, AuthService } from '../../../Services';
@@ -17,6 +18,7 @@ import { Discount } from '../../../Models';
     TableModule,
     ButtonModule,
     TagModule,
+    ToolbarModule,
     ToastModule
   ],
   providers: [MessageService],

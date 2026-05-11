@@ -1,9 +1,17 @@
-<div class="page-header">
-  <h1>Listas de Precios</h1>
-  @if (authService.hasPermission('pricelists.create')) {
-    <p-button label="Nueva Lista" icon="pi pi-plus" (onClick)="goToNewPriceList()"></p-button>
-  }
-</div>
+<p-toolbar styleClass="page-toolbar">
+  <ng-template pTemplate="start">
+    <div class="toolbar-title">
+      <i class="pi pi-tag"></i>
+      <h2>Listas de Precios</h2>
+      <p-tag [value]="totalCount() + ' listas'" severity="secondary"></p-tag>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    @if (authService.hasPermission('pricelists.create')) {
+      <p-button label="Nueva Lista" icon="pi pi-plus" (onClick)="goToNewPriceList()"></p-button>
+    }
+  </ng-template>
+</p-toolbar>
 
 <div class="card">
   <p-table 

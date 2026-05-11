@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
+import { ToolbarModule } from 'primeng/toolbar';
 import { ToastModule } from 'primeng/toast';
 import { BadgeModule } from 'primeng/badge';
 import { DialogModule } from 'primeng/dialog';
@@ -23,7 +24,7 @@ export interface ContactMessage {
 @Component({
   selector: 'app-contact-messages',
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, TagModule, ToastModule, BadgeModule, DialogModule],
+  imports: [CommonModule, TableModule, ButtonModule, TagModule, ToolbarModule, ToastModule, BadgeModule, DialogModule],
   providers: [MessageService],
   templateUrl: './contact-messages.component.html',
   styleUrl: './contact-messages.component.scss'

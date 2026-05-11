@@ -1,13 +1,21 @@
-<div class="page-header">
-  <h1>Categorías</h1>
-  @if (authService.hasPermission('products.create')) {
-    <p-button label="Nueva Categoría" icon="pi pi-plus" (onClick)="goToNewCategory()"></p-button>
-  }
-</div>
+<p-toolbar styleClass="page-toolbar">
+  <ng-template pTemplate="start">
+    <div class="toolbar-title">
+      <i class="pi pi-tag"></i>
+      <h2>Categorías</h2>
+      <p-tag [value]="totalRecords() + ' categorías'" severity="secondary"></p-tag>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    @if (authService.hasPermission('products.create')) {
+      <p-button label="Nueva Categoría" icon="pi pi-plus" (onClick)="goToNewCategory()"></p-button>
+    }
+  </ng-template>
+</p-toolbar>
 
 <div class="card">
-  <div class="table-header">
-    <p-inputgroup>
+  <div class="filters-bar">
+    <p-inputGroup class="search-input">
       <input 
         type="text" 
         pInputText 
@@ -15,10 +23,10 @@
         (input)="onSearch()" 
         placeholder="Buscar categorías..."
       />
-      <p-inputgroup-addon>
+      <p-inputGroupAddon>
         <p-button icon="pi pi-search" [text]="true" severity="secondary" />
-      </p-inputgroup-addon>
-    </p-inputgroup>
+      </p-inputGroupAddon>
+    </p-inputGroup>
   </div>
 
   <p-table 

@@ -1,9 +1,17 @@
-<div class="page-header">
-  <h1>Almacenes</h1>
-  @if (authService.hasPermission('warehouses.create')) {
-    <p-button label="Nuevo Almacén" icon="pi pi-plus" (onClick)="goToNewWarehouse()"></p-button>
-  }
-</div>
+<p-toolbar styleClass="page-toolbar">
+  <ng-template pTemplate="start">
+    <div class="toolbar-title">
+      <i class="pi pi-warehouse"></i>
+      <h2>Almacenes</h2>
+      <p-tag [value]="totalCount() + ' almacenes'" severity="secondary"></p-tag>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    @if (authService.hasPermission('warehouses.create')) {
+      <p-button label="Nuevo Almacén" icon="pi pi-plus" (onClick)="goToNewWarehouse()"></p-button>
+    }
+  </ng-template>
+</p-toolbar>
 
 <div class="card">
   <p-table 
