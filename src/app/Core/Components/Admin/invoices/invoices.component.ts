@@ -178,7 +178,7 @@ export class InvoicesComponent implements OnInit {
     });
   }
 
-  statusSeverity(status: number): string {
+  statusSeverity(status: number): 'success' | 'danger' | 'warn' | 'secondary' | 'info' | 'contrast' {
     if (status === 1) return 'success';
     if (status === 2) return 'danger';
     return 'warn';

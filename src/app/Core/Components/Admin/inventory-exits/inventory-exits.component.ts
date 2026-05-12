@@ -193,7 +193,7 @@ export class InventoryExitsComponent implements OnInit {
     });
   }
 
-  statusSeverity(status: string): string {
+  statusSeverity(status: string): 'success' | 'danger' | 'warn' | 'secondary' | 'info' | 'contrast' {
     if (status === 'Confirmado') return 'success';
     if (status === 'Cancelado') return 'danger';
     return 'warn';
