@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -13,6 +13,8 @@ import { TagModule } from 'primeng/tag';
 import { ToolbarModule } from 'primeng/toolbar';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { MessageService } from 'primeng/api';
 import { ApiService, AuthService } from '../../../Services';
 
@@ -22,7 +24,7 @@ import { ApiService, AuthService } from '../../../Services';
   imports: [
     CommonModule, FormsModule, TableModule, ButtonModule, InputTextModule,
     InputNumberModule, SelectModule, PaginatorModule, ToastModule, TooltipModule,
-    TagModule, ToolbarModule, CardModule, DividerModule
+    TagModule, ToolbarModule, CardModule, DividerModule, IconFieldModule, InputIconModule
   ],
   providers: [MessageService],
   templateUrl: './invoices.component.html',
@@ -35,19 +37,29 @@ export class InvoicesComponent implements OnInit {
   total = signal(0);
   pageSize = 10;
   selectedInvoice = signal<any>(null);
-
   customers = signal<any[]>([]);
+
+  // Filters
+  filterSearch = '';
+  filterStatus: number | null = null;
+
+  statusFilterOptions = [
+    { label: 'Todos', value: null },
+    { label: 'Pendiente', value: 0 },
+    { label: 'Pagada', value: 1 },
+    { label: 'Cancelada', value: 2 }
+  ];
+
+  // KPIs
+  kpiTotal = signal(0);
+  kpiPending = signal(0);
+  kpiPaid = signal(0);
+  kpiCancelled = signal(0);
 
   editingId: string | null = null;
   header: any = {};
   items: any[] = [];
   newItem: any = { quantity: 1, unitPrice: 0, discount: 0 };
-
-  statusOptions = [
-    { label: 'Pendiente', value: 0 },
-    { label: 'Pagada', value: 1 },
-    { label: 'Cancelada', value: 2 }
-  ];
 
   constructor(public authService: AuthService, private apiService: ApiService, private messageService: MessageService) {}
 
@@ -58,7 +70,28 @@ export class InvoicesComponent implements OnInit {
 
   loadInvoices(page = 1): void {
     this.apiService.getInvoices(page, this.pageSize).subscribe({
-      next: (res: any) => { this.invoices.set(res.data); this.total.set(res.total ?? 0); }
+      next: (res: any) => {
+        this.invoices.set(res.data);
+        this.total.set(res.total ?? 0);
+        this.computeKpis(res.data);
+      }
+    });
+  }
+
+  computeKpis(data: any[]): void {
+    this.kpiTotal.set(data.reduce((s: number, i: any) => s + (i.total || 0), 0));
+    this.kpiPending.set(data.filter((i: any) => i.status === 0).reduce((s: number, i: any) => s + (i.total || 0), 0));
+    this.kpiPaid.set(data.filter((i: any) => i.status === 1).reduce((s: number, i: any) => s + (i.total || 0), 0));
+    this.kpiCancelled.set(data.filter((i: any) => i.status === 2).length);
+  }
+
+  filteredInvoices(): any[] {
+    return this.invoices().filter(inv => {
+      const matchSearch = !this.filterSearch ||
+        inv.invoiceNumber?.toLowerCase().includes(this.filterSearch.toLowerCase()) ||
+        inv.customerName?.toLowerCase().includes(this.filterSearch.toLowerCase());
+      const matchStatus = this.filterStatus === null || inv.status === this.filterStatus;
+      return matchSearch && matchStatus;
     });
   }
 
@@ -68,12 +101,14 @@ export class InvoicesComponent implements OnInit {
 
   onPageChange(event: any): void { this.pageSize = event.rows; this.loadInvoices(event.page + 1); }
 
+  clearFilters(): void { this.filterSearch = ''; this.filterStatus = null; }
+
   openNew(): void {
     this.editingId = null;
     this.header = {
       date: new Date().toISOString().split('T')[0],
       dueDate: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
-      taxRate: 16
+      taxRate: 19
     };
     this.items = [];
     this.newItem = { quantity: 1, unitPrice: 0, discount: 0 };
@@ -118,9 +153,7 @@ export class InvoicesComponent implements OnInit {
   }
 
   subtotal(): number { return this.items.reduce((s, i) => s + this.itemTotal(i), 0); }
-
   taxAmount(): number { return this.subtotal() * ((this.header.taxRate || 0) / 100); }
-
   total2(): number { return this.subtotal() + this.taxAmount(); }
 
   save(): void {
@@ -129,7 +162,7 @@ export class InvoicesComponent implements OnInit {
       return;
     }
     if (this.items.length === 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Agregue al menos un item' });
+      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Agregue al menos un ítem' });
       return;
     }
     const sub = this.subtotal();
@@ -165,7 +198,11 @@ export class InvoicesComponent implements OnInit {
     const label = status === 1 ? 'marcar como Pagada' : 'cancelar';
     if (!confirm(`¿Desea ${label} esta factura?`)) return;
     this.apiService.updateInvoiceStatus(id, status).subscribe({
-      next: () => { this.messageService.add({ severity: 'success', summary: 'Actualizado', detail: '' }); this.loadInvoices(); if (this.view() === 'detail') this.viewDetail({ id }); },
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Actualizado', detail: '' });
+        this.loadInvoices();
+        if (this.view() === 'detail') this.viewDetail({ id });
+      },
       error: (e: any) => this.messageService.add({ severity: 'error', summary: 'Error', detail: e.error?.message || 'Error' })
     });
   }
@@ -186,5 +223,9 @@ export class InvoicesComponent implements OnInit {
 
   statusLabel(status: number): string {
     return ['Pendiente', 'Pagada', 'Cancelada'][status] ?? 'Pendiente';
+  }
+
+  statusFilterChange(val: number | null): void {
+    this.filterStatus = val;
   }
 }

@@ -4,7 +4,7 @@
       <i class="pi pi-receipt"></i>
       <h2>Facturas</h2>
       @if (view() === 'list') {
-        <p-tag [value]="total() + ' facturas'" severity="secondary"></p-tag>
+        <p-tag [value]="total() + ' registros'" severity="secondary"></p-tag>
       } @else if (view() === 'form') {
         <p-tag value="Nueva Factura" severity="info"></p-tag>
       } @else {
@@ -26,103 +26,202 @@
   </ng-template>
 </p-toolbar>
 
-<!-- LIST VIEW -->
+<!-- ══════════════════════════════════════════
+     LIST VIEW
+══════════════════════════════════════════ -->
 @if (view() === 'list') {
-  <p-table [value]="invoices()" [paginator]="true" [rows]="pageSize" [totalRecords]="total()"
-    [lazy]="true" (onPage)="onPageChange($event)" styleClass="p-datatable-striped">
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Nro. Factura</th>
-        <th>Cliente</th>
-        <th>NIT</th>
-        <th>Fecha</th>
-        <th>Total</th>
-        <th>Estado</th>
-        <th style="width:160px">Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-inv>
-      <tr>
-        <td><strong>{{ inv.invoiceNumber }}</strong></td>
-        <td>{{ inv.customerName }}</td>
-        <td>{{ inv.customerNit }}</td>
-        <td>{{ inv.issueDate | date:'dd/MM/yyyy' }}</td>
-        <td>{{ inv.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-        <td><p-tag [value]="statusLabel(inv.status)" [severity]="statusSeverity(inv.status)"></p-tag></td>
-        <td>
-          <p-button icon="pi pi-eye" [text]="true" pTooltip="Ver detalle" (onClick)="viewDetail(inv)"></p-button>
-          @if (inv.status === 0) {
-            <p-button icon="pi pi-check" [text]="true" severity="success" pTooltip="Marcar Pagada" (onClick)="updateStatus(inv.id, 1)"></p-button>
-            <p-button icon="pi pi-times" [text]="true" severity="warn" pTooltip="Cancelar" (onClick)="updateStatus(inv.id, 2)"></p-button>
-            <p-button icon="pi pi-trash" [text]="true" severity="danger" pTooltip="Eliminar" (onClick)="delete(inv.id)"></p-button>
-          }
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="emptymessage">
-      <tr><td colspan="7" class="text-center">No hay facturas registradas</td></tr>
-    </ng-template>
-  </p-table>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-icon--total"><i class="pi pi-file-edit"></i></div>
+      <div class="kpi-body">
+        <span class="kpi-label">Total facturado</span>
+        <span class="kpi-value">{{ kpiTotal() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-icon--pending"><i class="pi pi-clock"></i></div>
+      <div class="kpi-body">
+        <span class="kpi-label">Por cobrar</span>
+        <span class="kpi-value kpi-value--pending">{{ kpiPending() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-icon--paid"><i class="pi pi-check-circle"></i></div>
+      <div class="kpi-body">
+        <span class="kpi-label">Cobrado</span>
+        <span class="kpi-value kpi-value--paid">{{ kpiPaid() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-icon--cancelled"><i class="pi pi-times-circle"></i></div>
+      <div class="kpi-body">
+        <span class="kpi-label">Canceladas</span>
+        <span class="kpi-value kpi-value--cancelled">{{ kpiCancelled() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar">
+    <p-iconfield class="filter-search">
+      <p-inputicon styleClass="pi pi-search" />
+      <input pInputText [(ngModel)]="filterSearch" placeholder="Buscar por número o cliente…" />
+    </p-iconfield>
+    <div class="filter-status">
+      @for (opt of statusFilterOptions; track opt.value) {
+        <button class="status-chip"
+          [class.active]="filterStatus === opt.value"
+          (click)="filterStatus = opt.value">
+          {{ opt.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrapper">
+    <p-table [value]="filteredInvoices()" [paginator]="true" [rows]="pageSize"
+      [totalRecords]="total()" [lazy]="true" (onPage)="onPageChange($event)"
+      styleClass="p-datatable-striped" [rowHover]="true">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width:160px">Nro. Factura</th>
+          <th>Cliente</th>
+          <th style="width:140px">NIT / Doc.</th>
+          <th style="width:110px">Fecha</th>
+          <th style="width:140px" class="text-right">Total</th>
+          <th style="width:110px">Estado</th>
+          <th style="width:130px" class="text-center">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-inv>
+        <tr class="table-row">
+          <td>
+            <span class="invoice-number">{{ inv.invoiceNumber }}</span>
+          </td>
+          <td>{{ inv.customerName }}</td>
+          <td class="text-muted">{{ inv.customerNit }}</td>
+          <td class="text-muted">{{ inv.issueDate | date:'dd/MM/yyyy' }}</td>
+          <td class="text-right">
+            <strong>{{ inv.total | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+          </td>
+          <td>
+            <p-tag [value]="statusLabel(inv.status)" [severity]="statusSeverity(inv.status)"></p-tag>
+          </td>
+          <td class="text-center">
+            <div class="action-buttons">
+              <p-button icon="pi pi-eye" [text]="true" pTooltip="Ver detalle" tooltipPosition="top" (onClick)="viewDetail(inv)"></p-button>
+              @if (inv.status === 0) {
+                <p-button icon="pi pi-check" [text]="true" severity="success" pTooltip="Marcar Pagada" tooltipPosition="top" (onClick)="updateStatus(inv.id, 1)"></p-button>
+                <p-button icon="pi pi-ban" [text]="true" severity="warn" pTooltip="Cancelar" tooltipPosition="top" (onClick)="updateStatus(inv.id, 2)"></p-button>
+                <p-button icon="pi pi-trash" [text]="true" severity="danger" pTooltip="Eliminar" tooltipPosition="top" (onClick)="delete(inv.id)"></p-button>
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <p>No hay facturas registradas</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
 }
 
-<!-- FORM VIEW -->
+<!-- ══════════════════════════════════════════
+     FORM VIEW
+══════════════════════════════════════════ -->
 @if (view() === 'form') {
-  <div class="batch-form">
-    <p-card header="Datos de la Factura" styleClass="mb-4">
-      <div class="form-grid">
-        <div class="form-row">
-          <div class="form-field">
-            <label>Nro. Factura *</label>
-            <input pInputText [(ngModel)]="header.invoiceNumber" placeholder="FAC-2025-001" class="w-full" />
-          </div>
-          <div class="form-field">
-            <label>Cliente</label>
-            <p-select [(ngModel)]="header.customerId" [options]="customers()"
-              optionLabel="name" optionValue="id" placeholder="Buscar cliente" [filter]="true"
-              filterBy="name,documentNumber" styleClass="w-full" (ngModelChange)="onCustomerChange()">
-              <ng-template pTemplate="item" let-c>{{ c.name }} {{ c.lastName }} — {{ c.documentNumber }}</ng-template>
-            </p-select>
-          </div>
+  <div class="invoice-form-layout">
+
+    <!-- LEFT COLUMN: datos + ítems -->
+    <div class="invoice-form-main">
+
+      <!-- Datos de la factura -->
+      <div class="form-section">
+        <div class="form-section-header">
+          <i class="pi pi-file-edit"></i>
+          <span>Datos de la Factura</span>
         </div>
-        <div class="form-row">
-          <div class="form-field">
-            <label>Nombre cliente *</label>
-            <input pInputText [(ngModel)]="header.customerName" class="w-full" />
+        <div class="form-grid">
+          <div class="form-row">
+            <div class="form-field">
+              <label>Nro. Factura <span class="required">*</span></label>
+              <input pInputText [(ngModel)]="header.invoiceNumber" placeholder="FAC-2025-001" class="w-full" />
+            </div>
+            <div class="form-field narrow">
+              <label>IVA %</label>
+              <p-inputNumber [(ngModel)]="header.taxRate" [min]="0" [max]="100" styleClass="w-full"></p-inputNumber>
+            </div>
           </div>
-          <div class="form-field">
-            <label>NIT / Documento *</label>
-            <input pInputText [(ngModel)]="header.customerNit" class="w-full" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-field">
-            <label>Dirección cliente</label>
-            <input pInputText [(ngModel)]="header.customerAddress" class="w-full" />
-          </div>
-          <div class="form-field narrow">
-            <label>IVA %</label>
-            <p-inputNumber [(ngModel)]="header.taxRate" [min]="0" [max]="100" styleClass="w-full"></p-inputNumber>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-field">
-            <label>Fecha emisión</label>
-            <input pInputText type="date" [(ngModel)]="header.date" class="w-full" />
-          </div>
-          <div class="form-field">
-            <label>Fecha vencimiento</label>
-            <input pInputText type="date" [(ngModel)]="header.dueDate" class="w-full" />
+          <div class="form-row">
+            <div class="form-field">
+              <label>Fecha emisión</label>
+              <input pInputText type="date" [(ngModel)]="header.date" class="w-full" />
+            </div>
+            <div class="form-field">
+              <label>Fecha vencimiento</label>
+              <input pInputText type="date" [(ngModel)]="header.dueDate" class="w-full" />
+            </div>
           </div>
         </div>
       </div>
-    </p-card>
 
-    <p-card header="Agregar Ítem" styleClass="mb-4">
-      <div class="form-grid">
-        <div class="form-row">
-          <div class="form-field">
-            <label>Descripción *</label>
-            <input pInputText [(ngModel)]="newItem.productName" placeholder="Nombre del producto/servicio" class="w-full" />
+      <!-- Datos del cliente -->
+      <div class="form-section">
+        <div class="form-section-header">
+          <i class="pi pi-user"></i>
+          <span>Cliente</span>
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <div class="form-field">
+              <label>Buscar cliente</label>
+              <p-select [(ngModel)]="header.customerId" [options]="customers()"
+                optionLabel="name" optionValue="id" placeholder="Seleccionar cliente" [filter]="true"
+                filterBy="name,documentNumber" styleClass="w-full" (ngModelChange)="onCustomerChange()">
+                <ng-template pTemplate="item" let-c>{{ c.name }} {{ c.lastName }} — {{ c.documentNumber }}</ng-template>
+              </p-select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Nombre <span class="required">*</span></label>
+              <input pInputText [(ngModel)]="header.customerName" class="w-full" />
+            </div>
+            <div class="form-field">
+              <label>NIT / Documento <span class="required">*</span></label>
+              <input pInputText [(ngModel)]="header.customerNit" class="w-full" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field full">
+              <label>Dirección</label>
+              <input pInputText [(ngModel)]="header.customerAddress" class="w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agregar ítem -->
+      <div class="form-section">
+        <div class="form-section-header">
+          <i class="pi pi-list"></i>
+          <span>Ítems de la Factura</span>
+        </div>
+
+        <div class="add-item-row">
+          <div class="form-field" style="flex:2">
+            <label>Descripción <span class="required">*</span></label>
+            <input pInputText [(ngModel)]="newItem.productName" placeholder="Producto o servicio" class="w-full" />
           </div>
           <div class="form-field narrow">
             <label>Cant.</label>
@@ -137,139 +236,171 @@
             <p-inputNumber [(ngModel)]="newItem.discount" [min]="0" [max]="100" styleClass="w-full"></p-inputNumber>
           </div>
           <div class="form-field narrow flex-end">
-            <p-button label="Agregar" icon="pi pi-plus" (onClick)="addItem()"></p-button>
+            <p-button icon="pi pi-plus" label="Agregar" (onClick)="addItem()"></p-button>
           </div>
         </div>
-      </div>
-    </p-card>
 
-    <p-card header="Ítems de la Factura">
-      <p-table [value]="items" styleClass="p-datatable-striped">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>#</th>
-            <th>Descripción</th>
-            <th>Cant.</th>
-            <th>Precio unit.</th>
-            <th>Desc. %</th>
-            <th>Total</th>
-            <th style="width:60px"></th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-item let-i="rowIndex">
-          <tr>
-            <td>{{ i + 1 }}</td>
-            <td>{{ item.productName }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.unitPrice | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            <td>{{ item.discount || 0 }}%</td>
-            <td>{{ itemTotal(item) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            <td><p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="removeItem(i)"></p-button></td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-          <tr><td colspan="7" class="text-center text-muted">Agregue ítems a la factura</td></tr>
-        </ng-template>
-        <ng-template pTemplate="footer">
-          @if (items.length > 0) {
+        <p-table [value]="items" styleClass="p-datatable-sm items-table">
+          <ng-template pTemplate="header">
             <tr>
-              <td colspan="5" class="text-right"><strong>Subtotal</strong></td>
-              <td colspan="2"><strong>{{ subtotal() | currency:'COP':'symbol-narrow':'1.0-0' }}</strong></td>
+              <th style="width:40px">#</th>
+              <th>Descripción</th>
+              <th style="width:70px" class="text-center">Cant.</th>
+              <th style="width:140px" class="text-right">Precio unit.</th>
+              <th style="width:70px" class="text-center">Desc.</th>
+              <th style="width:140px" class="text-right">Total</th>
+              <th style="width:50px"></th>
             </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-i="rowIndex">
             <tr>
-              <td colspan="5" class="text-right">IVA ({{ header.taxRate || 0 }}%)</td>
-              <td colspan="2">{{ taxAmount() | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-muted">{{ i + 1 }}</td>
+              <td>{{ item.productName }}</td>
+              <td class="text-center">{{ item.quantity }}</td>
+              <td class="text-right">{{ item.unitPrice | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-center text-muted">{{ item.discount || 0 }}%</td>
+              <td class="text-right"><strong>{{ itemTotal(item) | currency:'COP':'symbol-narrow':'1.0-0' }}</strong></td>
+              <td><p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="removeItem(i)"></p-button></td>
             </tr>
-            <tr class="total-row">
-              <td colspan="5" class="text-right"><strong>TOTAL</strong></td>
-              <td colspan="2"><strong>{{ total2() | currency:'COP':'symbol-narrow':'1.0-0' }}</strong></td>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7">
+                <div class="empty-state small">
+                  <i class="pi pi-shopping-cart"></i>
+                  <p>Agregue ítems a la factura</p>
+                </div>
+              </td>
             </tr>
-          }
-        </ng-template>
-      </p-table>
-    </p-card>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: resumen -->
+    <div class="invoice-form-sidebar">
+      <div class="summary-card">
+        <div class="summary-header">
+          <i class="pi pi-calculator"></i>
+          <span>Resumen</span>
+        </div>
+        <div class="summary-body">
+          <div class="summary-row">
+            <span>Ítems</span>
+            <span>{{ items.length }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>{{ subtotal() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </div>
+          <div class="summary-row">
+            <span>IVA ({{ header.taxRate || 0 }}%)</span>
+            <span>{{ taxAmount() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row total">
+            <span>TOTAL</span>
+            <span>{{ total2() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </div>
+        </div>
+        <p-button label="Guardar Factura" icon="pi pi-save" styleClass="w-full mt-3" (onClick)="save()"></p-button>
+      </div>
+    </div>
+
   </div>
 }
 
-<!-- DETAIL VIEW -->
+<!-- ══════════════════════════════════════════
+     DETAIL VIEW
+══════════════════════════════════════════ -->
 @if (view() === 'detail' && selectedInvoice()) {
-  <div class="batch-form">
-    <p-card styleClass="mb-4">
-      <div class="invoice-header">
-        <div class="invoice-meta">
-          <h3>{{ selectedInvoice().invoiceNumber }}</h3>
-          <p-tag [value]="statusLabel(selectedInvoice().status)" [severity]="statusSeverity(selectedInvoice().status)"></p-tag>
+  <div class="invoice-document-wrapper">
+    <div class="invoice-document">
+
+      <!-- DOC HEADER -->
+      <div class="doc-header">
+        <div class="doc-brand">
+          <div class="doc-brand-name">d4nthi</div>
+          <div class="doc-brand-sub">Tienda Online</div>
         </div>
-        <div class="invoice-actions">
-          @if (selectedInvoice().status === 0) {
-            <p-button label="Marcar Pagada" icon="pi pi-check" severity="success" (onClick)="updateStatus(selectedInvoice().id, 1)"></p-button>
-            <p-button label="Cancelar" icon="pi pi-times" severity="warn" [outlined]="true" styleClass="ml-2" (onClick)="updateStatus(selectedInvoice().id, 2)"></p-button>
+        <div class="doc-title-block">
+          <div class="doc-invoice-number">{{ selectedInvoice().invoiceNumber }}</div>
+          <p-tag [value]="statusLabel(selectedInvoice().status)" [severity]="statusSeverity(selectedInvoice().status)" styleClass="doc-status-tag"></p-tag>
+        </div>
+      </div>
+
+      <div class="doc-divider"></div>
+
+      <!-- META ROW -->
+      <div class="doc-meta">
+        <div class="doc-meta-block">
+          <div class="doc-meta-label">Cliente</div>
+          <div class="doc-meta-value">{{ selectedInvoice().customerName }}</div>
+          <div class="doc-meta-sub">{{ selectedInvoice().customerNit }}</div>
+          @if (selectedInvoice().customerAddress) {
+            <div class="doc-meta-sub">{{ selectedInvoice().customerAddress }}</div>
           }
         </div>
-      </div>
-
-      <div class="form-grid mt-4">
-        <div class="form-row">
-          <div class="form-field">
-            <label>Cliente</label>
-            <p>{{ selectedInvoice().customerName }}</p>
-          </div>
-          <div class="form-field">
-            <label>NIT / Documento</label>
-            <p>{{ selectedInvoice().customerNit }}</p>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-field">
-            <label>Dirección</label>
-            <p>{{ selectedInvoice().customerAddress || '-' }}</p>
-          </div>
-          <div class="form-field">
-            <label>Fecha emisión / vencimiento</label>
-            <p>{{ selectedInvoice().issueDate | date:'dd/MM/yyyy' }} — {{ selectedInvoice().dueDate | date:'dd/MM/yyyy' }}</p>
-          </div>
+        <div class="doc-meta-block doc-meta-right">
+          <div class="doc-meta-label">Fecha de emisión</div>
+          <div class="doc-meta-value">{{ selectedInvoice().issueDate | date:'dd/MM/yyyy' }}</div>
+          <div class="doc-meta-label mt-2">Fecha de vencimiento</div>
+          <div class="doc-meta-value">{{ selectedInvoice().dueDate | date:'dd/MM/yyyy' }}</div>
         </div>
       </div>
-    </p-card>
 
-    <p-card header="Ítems">
-      <p-table [value]="selectedInvoice().items" styleClass="p-datatable-striped">
+      <div class="doc-divider"></div>
+
+      <!-- ITEMS TABLE -->
+      <p-table [value]="selectedInvoice().items" styleClass="doc-table">
         <ng-template pTemplate="header">
           <tr>
-            <th>#</th>
+            <th style="width:40px">#</th>
             <th>Descripción</th>
-            <th>Cant.</th>
-            <th>Precio unit.</th>
-            <th>Desc. %</th>
-            <th>Total</th>
+            <th style="width:70px" class="text-center">Cant.</th>
+            <th style="width:140px" class="text-right">Precio unit.</th>
+            <th style="width:70px" class="text-center">Desc.</th>
+            <th style="width:140px" class="text-right">Total</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-item let-i="rowIndex">
           <tr>
-            <td>{{ i + 1 }}</td>
+            <td class="text-muted">{{ i + 1 }}</td>
             <td>{{ item.productName }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.unitPrice | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            <td>{{ item.discount }}%</td>
-            <td>{{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="footer">
-          <tr>
-            <td colspan="5" class="text-right"><strong>Subtotal</strong></td>
-            <td><strong>{{ selectedInvoice().subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</strong></td>
-          </tr>
-          <tr>
-            <td colspan="5" class="text-right">IVA</td>
-            <td>{{ selectedInvoice().taxAmount | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-          </tr>
-          <tr class="total-row">
-            <td colspan="5" class="text-right"><strong>TOTAL</strong></td>
-            <td><strong>{{ selectedInvoice().total | currency:'COP':'symbol-narrow':'1.0-0' }}</strong></td>
+            <td class="text-center">{{ item.quantity }}</td>
+            <td class="text-right">{{ item.unitPrice | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+            <td class="text-center text-muted">{{ item.discount }}%</td>
+            <td class="text-right"><strong>{{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}</strong></td>
           </tr>
         </ng-template>
       </p-table>
-    </p-card>
+
+      <!-- TOTALS BLOCK -->
+      <div class="doc-totals">
+        <div class="doc-totals-row">
+          <span>Subtotal</span>
+          <span>{{ selectedInvoice().subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+        <div class="doc-totals-row">
+          <span>IVA</span>
+          <span>{{ selectedInvoice().taxAmount | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+        <div class="doc-totals-divider"></div>
+        <div class="doc-totals-row total">
+          <span>TOTAL</span>
+          <span>{{ selectedInvoice().total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      @if (selectedInvoice().status === 0) {
+        <div class="doc-actions">
+          <p-button label="Marcar como Pagada" icon="pi pi-check-circle" severity="success" (onClick)="updateStatus(selectedInvoice().id, 1)"></p-button>
+          <p-button label="Cancelar Factura" icon="pi pi-ban" severity="warn" [outlined]="true" (onClick)="updateStatus(selectedInvoice().id, 2)"></p-button>
+        </div>
+      }
+
+    </div>
   </div>
 }
 
