@@ -1,0 +1,28 @@
+.invoice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  .invoice-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #fff;
+    }
+  }
+}
+
+.mt-4 { margin-top: 1rem; }
+
+.total-row td {
+  font-size: 1.1rem;
+}
+
+.batch-form {
+  padding: 1rem;
+}

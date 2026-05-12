@@ -8,153 +8,199 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
-import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { ToolbarModule } from 'primeng/toolbar';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { CardModule } from 'primeng/card';
+import { DividerModule } from 'primeng/divider';
+import { MessageService } from 'primeng/api';
 import { ApiService, AuthService } from '../../../Services';
-
-interface InventoryEntry {
-  id: string;
-  productId: string;
-  productReferenceId?: string;
-  product?: any;
-  productReference?: any;
-  warehouseId: string;
-  warehouse?: any;
-  quantity: number;
-  supplier: string;
-  reference: string;
-  notes: string;
-  createdAt: string;
-}
 
 @Component({
   selector: 'app-inventory-entries',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    TableModule,
-    ButtonModule,
-    InputTextModule,
-    InputNumberModule,
-    TextareaModule,
-    SelectModule,
-    PaginatorModule,
-    DialogModule,
-    ToastModule,
-    TooltipModule,
-    TagModule,
-    ToolbarModule,
-    TagModule,
-    ConfirmDialogModule
+    CommonModule, FormsModule, TableModule, ButtonModule, InputTextModule,
+    InputNumberModule, TextareaModule, SelectModule, PaginatorModule,
+    ToastModule, TooltipModule, TagModule, ToolbarModule, CardModule, DividerModule
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService],
   templateUrl: './inventory-entries.component.html',
   styleUrl: './inventory-entries.component.scss'
 })
 export class InventoryEntriesComponent implements OnInit {
-  entries = signal<InventoryEntry[]>([]);
+  view = signal<'list' | 'form'>('list');
+
+  batches = signal<any[]>([]);
+  total = signal(0);
+  pageSize = 10;
+
   products = signal<any[]>([]);
   productReferences = signal<any[]>([]);
   warehouses = signal<any[]>([]);
-  totalCount = signal(0);
-  pageSize = 10;
-  showDialog = signal(false);
-  formData: any = {};
-  isEditing = signal(false);
 
-  constructor(private apiService: ApiService, public authService: AuthService, private messageService: MessageService, private confirmationService: ConfirmationService) {}
+  editingId: string | null = null;
+  header: any = {};
+  items: any[] = [];
+  newItem: any = { quantity: 1 };
+
+  constructor(public authService: AuthService, private apiService: ApiService, private messageService: MessageService) {}
 
   ngOnInit(): void {
-    this.loadEntries();
+    this.loadBatches();
     this.loadProducts();
     this.loadWarehouses();
   }
 
-  loadEntries(page = 1): void {
+  loadBatches(page = 1): void {
     this.apiService.getInventoryEntries(page, this.pageSize).subscribe({
-      next: (res: any) => { this.entries.set(res.data); this.totalCount.set(res.total ?? 0); },
-      error: () => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cargar entradas' }); }
+      next: (res: any) => { this.batches.set(res.data); this.total.set(res.total ?? 0); }
     });
   }
 
   loadProducts(): void {
-    this.apiService.getProducts(1, 100).subscribe({
-      next: (res: any) => { this.products.set(res.data); }
-    });
-  }
-  
-  onProductChange(productId: string): void {
-    if (productId) {
-      this.apiService.getProductReferences(productId).subscribe({
-        next: (refs: any) => { 
-          this.productReferences.set(refs); 
-          // Reset productReferenceId when product changes
-          this.formData.productReferenceId = null;
-        },
-        error: () => { 
-          this.productReferences.set([]); 
-          this.formData.productReferenceId = null;
-        }
-      });
-    } else {
-      this.productReferences.set([]);
-      this.formData.productReferenceId = null;
-    }
+    this.apiService.getProducts(1, 1000).subscribe({ next: (res: any) => this.products.set(res.data) });
   }
 
   loadWarehouses(): void {
-    this.apiService.getWarehouses(1, 100).subscribe({
-      next: (res: any) => { this.warehouses.set(res.data); }
-    });
+    this.apiService.getWarehouses(1, 100).subscribe({ next: (res: any) => this.warehouses.set(res.data) });
   }
 
-  onPageChange(event: any): void {
-    this.pageSize = event.rows;
-    this.loadEntries(event.page + 1);
-  }
+  onPageChange(event: any): void { this.pageSize = event.rows; this.loadBatches(event.page + 1); }
 
-  openDialog(): void {
-    this.isEditing.set(false);
-    this.formData = { quantity: 1 };
+  openNew(): void {
+    this.editingId = null;
+    this.header = { date: new Date().toISOString().split('T')[0] };
+    this.items = [];
+    this.newItem = { quantity: 1 };
     this.productReferences.set([]);
-    this.showDialog.set(true);
+    this.view.set('form');
   }
 
-  closeDialog(): void {
-    this.showDialog.set(false);
-  }
-
-  saveEntry(): void {
-    this.apiService.createInventoryEntry(this.formData).subscribe({
-      next: () => { this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Entrada registrada' }); this.closeDialog(); this.loadEntries(); },
-      error: () => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al registrar' }); }
-    });
-  }
-
-  deleteEntry(id: string): void {
-    this.confirmationService.confirm({
-      message: '¿Eliminar esta entrada?',
-      header: 'Confirmar',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.apiService.deleteInventoryEntry(id).subscribe({
-          next: () => { this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Eliminado' }); this.loadEntries(); },
-          error: () => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar' }); }
-        });
+  openEdit(batch: any): void {
+    this.apiService.getInventoryEntryBatch(batch.id).subscribe({
+      next: (b: any) => {
+        this.editingId = b.id;
+        this.header = {
+          warehouseId: b.warehouse?.id,
+          supplier: b.supplier,
+          reference: b.reference,
+          notes: b.notes,
+          date: b.date?.split('T')[0]
+        };
+        this.items = b.items.map((i: any) => ({
+          productId: i.productId,
+          productReferenceId: i.productReferenceId,
+          quantity: i.quantity,
+          productName: i.product?.name,
+          refCode: i.productReference?.referenceCode
+        }));
+        this.productReferences.set([]);
+        this.view.set('form');
       }
     });
   }
-  
-  getAttributeDisplay(reference: any): string {
-    if (!reference.attributeValues || reference.attributeValues.length === 0) {
-      return '';
+
+  backToList(): void { this.view.set('list'); this.loadBatches(); }
+
+  onProductChange(): void {
+    this.newItem.productReferenceId = null;
+    if (this.newItem.productId) {
+      this.apiService.getProductReferences(this.newItem.productId).subscribe({
+        next: (refs: any) => this.productReferences.set(refs),
+        error: () => this.productReferences.set([])
+      });
+    } else {
+      this.productReferences.set([]);
     }
-    return reference.attributeValues.map((av: any) => av.optionValue).join(', ');
+  }
+
+  addItem(): void {
+    if (!this.newItem.productId || !this.newItem.quantity) {
+      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Seleccione un producto y cantidad' });
+      return;
+    }
+    const prod = this.products().find(p => p.id === this.newItem.productId);
+    const ref = this.productReferences().find(r => r.id === this.newItem.productReferenceId);
+    this.items = [...this.items, {
+      productId: this.newItem.productId,
+      productReferenceId: this.newItem.productReferenceId ?? null,
+      quantity: this.newItem.quantity,
+      productName: prod?.name,
+      refCode: ref?.referenceCode
+    }];
+    this.newItem = { quantity: 1 };
+    this.productReferences.set([]);
+  }
+
+  removeItem(idx: number): void { this.items = this.items.filter((_, i) => i !== idx); }
+
+  save(): void {
+    if (!this.header.warehouseId || !this.header.supplier) {
+      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Bodega y proveedor son requeridos' });
+      return;
+    }
+    if (this.items.length === 0) {
+      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Agregue al menos un item' });
+      return;
+    }
+    const payload = {
+      warehouseId: this.header.warehouseId,
+      supplier: this.header.supplier,
+      reference: this.header.reference || null,
+      notes: this.header.notes || null,
+      date: this.header.date ? new Date(this.header.date).toISOString() : new Date().toISOString(),
+      items: this.items.map(i => ({ productId: i.productId, productReferenceId: i.productReferenceId || null, quantity: i.quantity }))
+    };
+    const req = this.editingId
+      ? this.apiService.updateInventoryEntry(this.editingId, payload)
+      : this.apiService.createInventoryEntry(payload);
+    req.subscribe({
+      next: () => { this.messageService.add({ severity: 'success', summary: 'Guardado', detail: 'Lote guardado como borrador' }); this.backToList(); },
+      error: (e: any) => this.messageService.add({ severity: 'error', summary: 'Error', detail: e.error?.message || 'Error al guardar' })
+    });
+  }
+
+  confirm(id: string): void {
+    if (!confirm('¿Confirmar este lote? Se actualizará el inventario.')) return;
+    this.apiService.confirmInventoryEntry(id).subscribe({
+      next: () => { this.messageService.add({ severity: 'success', summary: 'Confirmado', detail: 'Inventario actualizado' }); this.loadBatches(); },
+      error: (e: any) => this.messageService.add({ severity: 'error', summary: 'Error', detail: e.error?.message || 'Error al confirmar' })
+    });
+  }
+
+  cancel(id: string): void {
+    if (!confirm('¿Cancelar este lote?')) return;
+    this.apiService.cancelInventoryEntry(id).subscribe({
+      next: () => { this.messageService.add({ severity: 'success', summary: 'Cancelado', detail: '' }); this.loadBatches(); },
+      error: (e: any) => this.messageService.add({ severity: 'error', summary: 'Error', detail: e.error?.message || 'Error' })
+    });
+  }
+
+  delete(id: string): void {
+    if (!confirm('¿Eliminar este lote?')) return;
+    this.apiService.deleteInventoryEntry(id).subscribe({
+      next: () => { this.messageService.add({ severity: 'success', summary: 'Eliminado', detail: '' }); this.loadBatches(); },
+      error: (e: any) => this.messageService.add({ severity: 'error', summary: 'Error', detail: e.error?.message || 'Error' })
+    });
+  }
+
+  statusSeverity(status: string): string {
+    if (status === 'Confirmado') return 'success';
+    if (status === 'Cancelado') return 'danger';
+    return 'warn';
+  }
+
+  getProductLabel(productId: string): string {
+    return this.products().find(p => p.id === productId)?.name || productId;
+  }
+
+  getWarehouseLabel(warehouseId: string): string {
+    return this.warehouses().find(w => w.id === warehouseId)?.name || warehouseId;
+  }
+
+  getRefLabel(refId: string): string {
+    return this.productReferences().find(r => r.id === refId)?.referenceCode || '';
   }
 }

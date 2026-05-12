@@ -54,6 +54,7 @@ export class LayoutComponent {
     '/admin/taxes': 'Impuestos',
     '/admin/users': 'Usuarios',
     '/admin/orders': 'Pedidos',
+    '/admin/invoices': 'Facturas',
     '/admin/profiles': 'Perfiles',
     '/admin/brands': 'Marcas',
     '/admin/contact-messages': 'Mensajes',
@@ -73,6 +74,7 @@ export class LayoutComponent {
     '/admin/brands': '/admin/brands',
     '/admin/warehouses': '/admin/warehouses',
     '/admin/orders': '/admin/orders',
+    '/admin/invoices': '/admin/invoices',
     '/admin/customers': '/admin/customers',
     '/admin/customer-groups': '/admin/customer-groups',
     '/admin/discounts': '/admin/discounts',
@@ -218,6 +220,7 @@ export class LayoutComponent {
       ]) },
       { label: 'Operaciones', items: this.filterItems([
         { label: 'Pedidos', icon: 'pi pi-shopping-cart', routerLink: '/admin/orders', permission: 'orders.read' },
+        { label: 'Facturas', icon: 'pi pi-receipt', routerLink: '/admin/invoices', permission: 'invoices.read' },
         { label: 'Mensajes de Contacto', icon: 'pi pi-envelope', routerLink: '/admin/contact-messages' },
         { label: 'Entradas', icon: 'pi pi-plus-circle', routerLink: '/admin/inventory-entries', permission: 'inventory.entries.read' },
         { label: 'Salidas', icon: 'pi pi-minus-circle', routerLink: '/admin/inventory-exits', permission: 'inventory.exits.read' },

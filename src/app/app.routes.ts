@@ -55,6 +55,7 @@ export const routes: Routes = [
       { path: 'orders/new',             loadComponent: () => import('./Core/Components/Admin/orders/order-form.component').then(m => m.OrderFormComponent) },
       { path: 'orders/detail/:id',      loadComponent: () => import('./Core/Components/Admin/orders/order-detail.component').then(m => m.OrderDetailComponent) },
       { path: 'orders/edit/:id',        loadComponent: () => import('./Core/Components/Admin/orders/order-form.component').then(m => m.OrderFormComponent) },
+      { path: 'invoices',               loadComponent: () => import('./Core/Components/Admin/invoices/invoices.component').then(m => m.InvoicesComponent) },
       { path: 'contact-messages',       loadComponent: () => import('./Core/Components/Admin/contact-messages/contact-messages.component').then(m => m.ContactMessagesComponent) },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]

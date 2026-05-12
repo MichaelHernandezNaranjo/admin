@@ -40,3 +40,8 @@
 
 .w-full { width: 100%; }
 .text-center { text-align: center; }
+
+.batch-form { padding: 1rem; }
+
+.form-field.narrow { flex: 0 0 130px; }
+.form-field.flex-end { justify-content: flex-end; }

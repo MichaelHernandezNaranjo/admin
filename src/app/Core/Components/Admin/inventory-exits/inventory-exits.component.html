@@ -2,117 +2,159 @@
   <ng-template pTemplate="start">
     <div class="toolbar-title">
       <i class="pi pi-minus-circle"></i>
-      <h2>Salida de Mercancía</h2>
-      <p-tag [value]="totalCount() + ' salidas'" severity="secondary"></p-tag>
+      <h2>Salidas de Mercancía</h2>
+      @if (view() === 'list') {
+        <p-tag [value]="total() + ' lotes'" severity="secondary"></p-tag>
+      } @else {
+        <p-tag [value]="editingId ? 'Editar Lote' : 'Nuevo Lote'" severity="info"></p-tag>
+      }
     </div>
   </ng-template>
   <ng-template pTemplate="end">
-    @if (authService.hasPermission('inventory.exits.create')) {
-      <p-button label="Nueva Salida" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
+    @if (view() === 'list') {
+      @if (authService.hasPermission('inventory.exits.create')) {
+        <p-button label="Nuevo Lote" icon="pi pi-plus" (onClick)="openNew()"></p-button>
+      }
+    } @else {
+      <p-button label="Volver" icon="pi pi-arrow-left" severity="secondary" [outlined]="true" (onClick)="backToList()"></p-button>
+      <p-button label="Guardar Borrador" icon="pi pi-save" (onClick)="save()" styleClass="ml-2"></p-button>
     }
   </ng-template>
 </p-toolbar>
 
-<p-table [value]="exits()" [paginator]="true" [rows]="pageSize" [totalRecords]="totalCount()"
-  [lazy]="true" (onPage)="onPageChange($event)" [tableStyle]="{ 'min-width': '60rem' }"
-  styleClass="p-datatable-striped">
-  <ng-template pTemplate="header">
-    <tr>
-      <th>Nro. Ref</th>
-      <th>Producto</th>
-      <th>SKU/Referencia</th>
-      <th>Bodega</th>
-      <th>Cantidad</th>
-      <th>Motivo</th>
-      <th>Fecha</th>
-      <th style="width: 80px">Acciones</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-e>
-    <tr>
-      <td>{{ e.reference || 'N/A' }}</td>
-      <td>{{ e.product?.name || 'N/A' }}</td>
-      <td>{{ e.productReference?.referenceCode || '-' }}</td>
-      <td>{{ e.warehouse?.name || 'N/A' }}</td>
-      <td>{{ e.quantity }}</td>
-      <td>{{ e.reason }}</td>
-      <td>{{ e.createdAt | date:'short' }}</td>
-      <td>
-        @if (authService.hasPermission('inventory.exits.delete')) {
-          <p-button icon="pi pi-trash" [text]="true" severity="danger" pTooltip="Eliminar" (onClick)="deleteExit(e.id)"></p-button>
-        }
-      </td>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="emptymessage">
-    <tr>
-      <td colspan="8" class="text-center">No hay salidas de mercancía</td>
-    </tr>
-  </ng-template>
-</p-table>
+<!-- LIST VIEW -->
+@if (view() === 'list') {
+  <p-table [value]="batches()" [paginator]="true" [rows]="pageSize" [totalRecords]="total()"
+    [lazy]="true" (onPage)="onPageChange($event)" styleClass="p-datatable-striped">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Fecha</th>
+        <th>Motivo</th>
+        <th>Bodega</th>
+        <th>Referencia</th>
+        <th>Items</th>
+        <th>Estado</th>
+        <th style="width:140px">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-b>
+      <tr>
+        <td>{{ b.date | date:'dd/MM/yyyy' }}</td>
+        <td>{{ b.reason }}</td>
+        <td>{{ b.warehouse?.name }}</td>
+        <td>{{ b.reference || '-' }}</td>
+        <td>{{ b.itemCount }}</td>
+        <td><p-tag [value]="b.status" [severity]="statusSeverity(b.status)"></p-tag></td>
+        <td>
+          @if (b.status === 'Borrador') {
+            <p-button icon="pi pi-pencil" [text]="true" pTooltip="Editar" (onClick)="openEdit(b)"></p-button>
+            <p-button icon="pi pi-check" [text]="true" severity="success" pTooltip="Confirmar" (onClick)="confirm(b.id)"></p-button>
+            <p-button icon="pi pi-times" [text]="true" severity="warn" pTooltip="Cancelar" (onClick)="cancel(b.id)"></p-button>
+            <p-button icon="pi pi-trash" [text]="true" severity="danger" pTooltip="Eliminar" (onClick)="delete(b.id)"></p-button>
+          } @else {
+            <p-button icon="pi pi-eye" [text]="true" pTooltip="Ver detalle" (onClick)="openEdit(b)"></p-button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr><td colspan="7" class="text-center">No hay lotes registrados</td></tr>
+    </ng-template>
+  </p-table>
+}
 
-<p-dialog header="Nueva Salida de Mercancía" [(visible)]="showDialog" [modal]="true" 
-  [style]="{ width: '600px' }" [draggable]="false">
-  <div class="form-grid">
-    <div class="form-row">
-      <div class="form-field">
-        <label for="product">Producto *</label>
-        <p-select [(ngModel)]="formData.productId" [options]="products()" optionLabel="name" optionValue="id" 
-          placeholder="Seleccionar producto" [filter]="true" filterBy="name,productCode" styleClass="w-full"
-          (onChange)="onProductChange($event.value)">
-          <ng-template pTemplate="item" let-p>{{ p.name }} ({{ p.productCode }})</ng-template>
-        </p-select>
+<!-- FORM VIEW -->
+@if (view() === 'form') {
+  <div class="batch-form">
+    <p-card header="Datos del Lote" styleClass="mb-4">
+      <div class="form-grid">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Bodega *</label>
+            <p-select [(ngModel)]="header.warehouseId" [options]="warehouses()" optionLabel="name" optionValue="id"
+              placeholder="Seleccionar bodega" styleClass="w-full" [disabled]="!!editingId"></p-select>
+          </div>
+          <div class="form-field">
+            <label>Motivo *</label>
+            <p-select [(ngModel)]="header.reason" [options]="reasonOptions" optionLabel="label" optionValue="value"
+              placeholder="Seleccionar motivo" styleClass="w-full" [editable]="true"></p-select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Fecha</label>
+            <input pInputText type="date" [(ngModel)]="header.date" class="w-full" />
+          </div>
+          <div class="form-field">
+            <label>Referencia</label>
+            <input pInputText [(ngModel)]="header.reference" placeholder="Nro. documento / referencia" class="w-full" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field full">
+            <label>Notas</label>
+            <textarea pInputTextarea [(ngModel)]="header.notes" [rows]="2" class="w-full"></textarea>
+          </div>
+        </div>
       </div>
-      <div class="form-field">
-        <label for="reference">Referencia (Opcional)</label>
-        <p-select [(ngModel)]="formData.productReferenceId" [options]="productReferences()" 
-          optionLabel="referenceCode" optionValue="id" 
-          placeholder="Seleccionar referencia" styleClass="w-full"
-          [disabled]="!formData.productId || productReferences().length === 0">
-          <ng-template pTemplate="item" let-r>
-            {{ r.referenceCode }}
-            @if (r.attributeValues && r.attributeValues.length > 0) {
-              <span class="text-sm text-gray-500">
-                ({{ getAttributeDisplay(r) }})
-              </span>
-            }
-          </ng-template>
-        </p-select>
+    </p-card>
+
+    <p-card header="Agregar Producto" styleClass="mb-4">
+      <div class="form-grid">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Producto *</label>
+            <p-select [(ngModel)]="newItem.productId" [options]="products()" optionLabel="name" optionValue="id"
+              placeholder="Buscar producto" [filter]="true" filterBy="name,productCode" styleClass="w-full"
+              (ngModelChange)="onProductChange()">
+              <ng-template pTemplate="item" let-p>{{ p.name }} ({{ p.productCode }})</ng-template>
+            </p-select>
+          </div>
+          <div class="form-field">
+            <label>Referencia (opcional)</label>
+            <p-select [(ngModel)]="newItem.productReferenceId" [options]="productReferences()"
+              optionLabel="referenceCode" optionValue="id" placeholder="Todas las referencias" styleClass="w-full"
+              [disabled]="!newItem.productId || productReferences().length === 0"></p-select>
+          </div>
+          <div class="form-field narrow">
+            <label>Cantidad *</label>
+            <p-inputNumber [(ngModel)]="newItem.quantity" [min]="1" styleClass="w-full"></p-inputNumber>
+          </div>
+          <div class="form-field narrow flex-end">
+            <p-button label="Agregar" icon="pi pi-plus" (onClick)="addItem()"></p-button>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label for="warehouse">Bodega *</label>
-        <p-select [(ngModel)]="formData.warehouseId" [options]="warehouses()" optionLabel="name" optionValue="id" 
-          placeholder="Seleccionar bodega" styleClass="w-full"></p-select>
-      </div>
-      <div class="form-field">
-        <label for="quantity">Cantidad *</label>
-        <p-inputNumber [(ngModel)]="formData.quantity" [min]="1" styleClass="w-full"></p-inputNumber>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label for="reason">Motivo *</label>
-        <p-select [(ngModel)]="formData.reason" [options]="reasons" placeholder="Seleccionar motivo" styleClass="w-full"></p-select>
-      </div>
-      <div class="form-field">
-        <label for="reference">Nro. Orden/Referencia</label>
-        <input pInputText [(ngModel)]="formData.reference" placeholder="Número de orden o referencia" class="w-full" />
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-field full">
-        <label for="notes">Notas</label>
-        <textarea pInputTextarea [(ngModel)]="formData.notes" [rows]="2" class="w-full"></textarea>
-      </div>
-    </div>
+    </p-card>
+
+    <p-card header="Productos del Lote">
+      <p-table [value]="items" styleClass="p-datatable-striped">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>#</th>
+            <th>Producto</th>
+            <th>Referencia</th>
+            <th>Cantidad</th>
+            <th style="width:60px"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-i="rowIndex">
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ item.productName }}</td>
+            <td>{{ item.refCode || '-' }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>
+              <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="removeItem(i)"></p-button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="5" class="text-center text-muted">Agregue productos al lote</td></tr>
+        </ng-template>
+      </p-table>
+    </p-card>
   </div>
-  <ng-template pTemplate="footer">
-    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="closeDialog()"></p-button>
-    <p-button label="Guardar" icon="pi pi-check" (onClick)="saveExit()"></p-button>
-  </ng-template>
-</p-dialog>
+}
 
-<p-confirmDialog></p-confirmDialog>
 <p-toast></p-toast>

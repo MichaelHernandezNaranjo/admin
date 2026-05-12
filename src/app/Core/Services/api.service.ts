@@ -400,52 +400,97 @@ export class ApiService {
     return this.http.get<ApiResponse<Permission[]>>(`${this.API_URL}/permissions`);
   }
 
-  // Inventory Entries
+  // Inventory Entry Batches
   getInventoryEntries(page = 1, pageSize = 10): Observable<any> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('pageSize', pageSize.toString());
+    const params = new HttpParams().set('page', page.toString()).set('pageSize', pageSize.toString());
     return this.http.get<any>(`${this.API_URL}/inventory-entries`, { params });
   }
-
-  createInventoryEntry(entry: any): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}/inventory-entries`, entry);
+  getInventoryEntryBatch(id: string): Observable<any> {
+    return this.http.get<any>(`${this.API_URL}/inventory-entries/${id}`);
   }
-
+  createInventoryEntry(batch: any): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/inventory-entries`, batch);
+  }
+  updateInventoryEntry(id: string, batch: any): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}/inventory-entries/${id}`, batch);
+  }
+  confirmInventoryEntry(id: string): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/inventory-entries/${id}/confirm`, {});
+  }
+  cancelInventoryEntry(id: string): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/inventory-entries/${id}/cancel`, {});
+  }
   deleteInventoryEntry(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/inventory-entries/${id}`);
   }
 
-  // Inventory Exits
+  // Inventory Exit Batches
   getInventoryExits(page = 1, pageSize = 10): Observable<any> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('pageSize', pageSize.toString());
+    const params = new HttpParams().set('page', page.toString()).set('pageSize', pageSize.toString());
     return this.http.get<any>(`${this.API_URL}/inventory-exits`, { params });
   }
-
-  createInventoryExit(exit: any): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}/inventory-exits`, exit);
+  getInventoryExitBatch(id: string): Observable<any> {
+    return this.http.get<any>(`${this.API_URL}/inventory-exits/${id}`);
   }
-
+  createInventoryExit(batch: any): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/inventory-exits`, batch);
+  }
+  updateInventoryExit(id: string, batch: any): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}/inventory-exits/${id}`, batch);
+  }
+  confirmInventoryExit(id: string): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/inventory-exits/${id}/confirm`, {});
+  }
+  cancelInventoryExit(id: string): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/inventory-exits/${id}/cancel`, {});
+  }
   deleteInventoryExit(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/inventory-exits/${id}`);
   }
 
-  // Inventory Transfers
+  // Inventory Transfer Batches
   getInventoryTransfers(page = 1, pageSize = 10): Observable<any> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('pageSize', pageSize.toString());
+    const params = new HttpParams().set('page', page.toString()).set('pageSize', pageSize.toString());
     return this.http.get<any>(`${this.API_URL}/inventory-transfers`, { params });
   }
-
-  createInventoryTransfer(transfer: any): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}/inventory-transfers`, transfer);
+  getInventoryTransferBatch(id: string): Observable<any> {
+    return this.http.get<any>(`${this.API_URL}/inventory-transfers/${id}`);
   }
-
+  createInventoryTransfer(batch: any): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/inventory-transfers`, batch);
+  }
+  updateInventoryTransfer(id: string, batch: any): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}/inventory-transfers/${id}`, batch);
+  }
+  confirmInventoryTransfer(id: string): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/inventory-transfers/${id}/confirm`, {});
+  }
+  cancelInventoryTransfer(id: string): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/inventory-transfers/${id}/cancel`, {});
+  }
   deleteInventoryTransfer(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/inventory-transfers/${id}`);
+  }
+
+  // Invoices
+  getInvoices(page = 1, pageSize = 10): Observable<any> {
+    const params = new HttpParams().set('page', page.toString()).set('pageSize', pageSize.toString());
+    return this.http.get<any>(`${this.API_URL}/invoices`, { params });
+  }
+  getInvoice(id: string): Observable<any> {
+    return this.http.get<any>(`${this.API_URL}/invoices/${id}`);
+  }
+  getNextInvoiceNumber(): Observable<any> {
+    return this.http.get<any>(`${this.API_URL}/invoices/next-number`);
+  }
+  createInvoice(invoice: any): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/invoices`, invoice);
+  }
+  updateInvoiceStatus(id: string, status: number): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}/invoices/${id}/status`, { status });
+  }
+  deleteInvoice(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/invoices/${id}`);
   }
 
   // Attribute Definitions
