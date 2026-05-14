@@ -91,10 +91,14 @@
           </div>
           @if (order()!.paymentReference) {
             <div class="od-info-row">
-              <span class="od-info-label">Comprobante</span>
-              <a [href]="getVoucherUrl(order()!.paymentReference)" target="_blank" class="od-voucher-link">
-                <i class="pi pi-image"></i> Ver comprobante
-              </a>
+              <span class="od-info-label">Referencia de pago</span>
+              @if (order()!.paymentMethod === 'Wompi') {
+                <span class="od-info-value">{{ order()!.paymentReference }}</span>
+              } @else {
+                <a [href]="getVoucherUrl(order()!.paymentReference)" target="_blank" class="od-voucher-link">
+                  <i class="pi pi-image"></i> Ver comprobante
+                </a>
+              }
             </div>
           }
         </div>
