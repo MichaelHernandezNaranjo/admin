@@ -22,6 +22,16 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {
     this.validateTokenOnStartup();
+    this.startTokenExpiryCheck();
+  }
+
+  private startTokenExpiryCheck(): void {
+    setInterval(() => {
+      if (this.isTokenExpired() && this.isAuthenticated()) {
+        this.clearSession();
+        this.router.navigate(['/login']);
+      }
+    }, 60000);
   }
 
   private loadUserFromStorage(): UserInfo | null {
@@ -49,11 +59,15 @@ export class AuthService {
   }
 
   logout(): void {
+    this.clearSession();
+    this.router.navigate(['/login']);
+  }
+
+  clearSession(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     this.userSignal.set(null);
-    this.router.navigate(['/login']);
   }
 
   refreshToken(): Observable<AuthResponse> {
@@ -88,5 +102,18 @@ export class AuthService {
     localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
     localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
     this.userSignal.set(response.user);
+  }
+
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload.exp ? payload.exp * 1000 : 0;
+      return Date.now() >= exp;
+    } catch {
+      return true;
+    }
   }
 }

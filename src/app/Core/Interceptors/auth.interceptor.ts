@@ -1,10 +1,12 @@
-import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../Services';
+import { Router } from '@angular/router';
 
-export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
+  const router = inject(Router);
   const token = authService.getToken();
 
   if (token && !req.url.includes('/auth/login') && !req.url.includes('/auth/refresh')) {
@@ -27,12 +29,18 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
             });
             return next(newReq);
           }),
-          catchError(refreshError => {
-            authService.logout();
-            return throwError(() => refreshError);
+          catchError(() => {
+            authService.clearSession();
+            router.navigate(['/login']);
+            return throwError(() => error);
           })
         );
       }
+
+      if (error.status === 0 || error.status === 403 || error.status === 404) {
+        return throwError(() => error);
+      }
+
       return throwError(() => error);
     })
   );

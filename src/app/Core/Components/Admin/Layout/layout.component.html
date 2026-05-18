@@ -17,7 +17,7 @@
         @for (section of menuSections(); track section.label) {
           <div class="menu-section" [class.expanded]="isSectionExpanded(section.label)">
             <button class="menu-section-btn" (click)="toggleSection(section.label)">
-              <i [class]="section.icon" class="menu-section-icon"></i>
+              <i [class]="section.icon + ' menu-section-icon'"></i>
               <span class="menu-section-label">{{ section.label }}</span>
               <i class="pi pi-chevron-down menu-section-chevron"></i>
             </button>
@@ -28,7 +28,7 @@
                   [routerLink]="item.routerLink"
                   routerLinkActive="active"
                   (click)="onMenuItemClick()">
-                  <i [class]="item.icon" class="menu-link-icon"></i>
+                  <i [class]="item.icon + ' menu-link-icon'"></i>
                   <span class="menu-link-label">{{ item.label }}</span>
                 </a>
               }

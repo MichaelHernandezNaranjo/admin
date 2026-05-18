@@ -62,7 +62,7 @@ export const MENU_SECTIONS: MenuSection[] = [
     label: 'Finanzas',
     icon: 'pi pi-wallet',
     items: [
-      { label: 'Descuentos', icon: 'pi pi-percent', routerLink: '/admin/discounts', permission: 'discounts.read' },
+      { label: 'Descuentos', icon: 'pi pi-tag', routerLink: '/admin/discounts', permission: 'discounts.read' },
       { label: 'Impuestos', icon: 'pi pi-receipt', routerLink: '/admin/taxes', permission: 'taxes.read' }
     ]
   },
