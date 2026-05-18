@@ -28,9 +28,13 @@
   gap: 1rem;
   margin-bottom: 1.25rem;
 
+  @media (max-width: 600px) { flex-wrap: wrap; }
+
   .search-input {
     flex: 1;
     max-width: 420px;
+
+    @media (max-width: 600px) { max-width: 100%; min-width: 100%; }
   }
 }
 

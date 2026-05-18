@@ -4,12 +4,19 @@ h1 {
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+
+  @media (max-width: 480px) { font-size: 1.25rem; }
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.25rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
 }
 
 :host ::ng-deep .stat-card {
@@ -23,7 +30,9 @@ h1 {
   }
 
   .p-card-body {
-    padding: 1.5rem;
+    padding: 1.25rem;
+
+    @media (max-width: 600px) { padding: 1rem; }
   }
 
   .p-card-content {
@@ -35,6 +44,8 @@ h1 {
   display: flex;
   align-items: center;
   gap: 1.25rem;
+
+  @media (max-width: 600px) { gap: 0.75rem; }
 }
 
 .stat-icon-wrapper {
@@ -46,6 +57,8 @@ h1 {
   justify-content: center;
   flex-shrink: 0;
 
+  @media (max-width: 600px) { width: 44px; height: 44px; }
+
   &.products   { background: rgba(239, 68, 68, 0.12);  }
   &.warehouses { background: rgba(168, 85, 247, 0.12); }
   &.customers  { background: rgba(59, 130, 246, 0.12); }
@@ -54,6 +67,8 @@ h1 {
 
 .stat-icon {
   font-size: 1.5rem;
+
+  @media (max-width: 600px) { font-size: 1.25rem; }
 
   &.products   { color: #ef4444; }
   &.warehouses { color: #a855f7; }
@@ -69,6 +84,8 @@ h1 {
     color: var(--text-color);
     line-height: 1;
     letter-spacing: -0.02em;
+
+    @media (max-width: 600px) { font-size: 1.5rem; }
   }
 
   p {

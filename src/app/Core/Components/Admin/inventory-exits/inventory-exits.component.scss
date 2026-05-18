@@ -4,6 +4,12 @@
   align-items: center;
   margin-bottom: 1.5rem;
 
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
   h1 {
     margin: 0;
     font-size: 1.5rem;
@@ -21,6 +27,13 @@
 .form-row {
   display: flex;
   gap: 1rem;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &.warehouse-row { align-items: flex-end; }
 }
 
 .form-field {
@@ -41,7 +54,15 @@
 .w-full { width: 100%; }
 .text-center { text-align: center; }
 
-.batch-form { padding: 1rem; }
+.batch-form {
+  padding: 1rem;
 
-.form-field.narrow { flex: 0 0 130px; }
+  @media (max-width: 600px) { padding: 0.75rem; }
+}
+
+.form-field.narrow {
+  flex: 0 0 130px;
+
+  @media (max-width: 600px) { flex: 1 1 100%; }
+}
 .form-field.flex-end { justify-content: flex-end; }

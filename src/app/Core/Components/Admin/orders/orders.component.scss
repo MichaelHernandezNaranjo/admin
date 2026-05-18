@@ -3,15 +3,21 @@
   gap: 1rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
+
+  @media (max-width: 600px) { flex-direction: column; gap: 0.75rem; }
 }
 
 .search-input {
   flex: 1;
   min-width: 250px;
+
+  @media (max-width: 600px) { min-width: 100%; }
 }
 
 .status-select {
   min-width: 180px;
+
+  @media (max-width: 600px) { min-width: 100%; width: 100%; }
 }
 
 .text-muted {

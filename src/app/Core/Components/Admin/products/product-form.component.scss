@@ -52,6 +52,8 @@
   margin-top: 2rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--surface-border);
+
+  @media (max-width: 480px) { flex-wrap: wrap; justify-content: flex-start; }
 }
 
 // ===== IMAGE UPLOAD =====

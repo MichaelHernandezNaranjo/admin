@@ -30,7 +30,7 @@ import { Warehouse } from '../../../Models';
 })
 export class WarehouseFormComponent implements OnInit {
   editingWarehouse = signal<Warehouse | null>(null);
-  formData: Partial<Warehouse> = { isActive: true, isMain: false };
+  formData: Partial<Warehouse> = { isActive: true, isPrincipal: false };
   isLoading = signal(false);
 
   constructor(

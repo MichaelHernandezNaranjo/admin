@@ -106,7 +106,7 @@ export interface Warehouse {
   state?: string;
   country?: string;
   postalCode?: string;
-  isMain: boolean;
+  isPrincipal: boolean;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

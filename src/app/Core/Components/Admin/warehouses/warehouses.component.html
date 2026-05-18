@@ -41,7 +41,7 @@
         <td>{{ w.name }}</td>
         <td>{{ w.location }}</td>
         <td>
-          <p-tag [value]="w.isMain ? 'Sí' : 'No'" [severity]="getMainSeverity(w.isMain)"></p-tag>
+          <p-tag [value]="w.isPrincipal ? 'Sí' : 'No'" [severity]="getPrincipalSeverity(w.isPrincipal)"></p-tag>
         </td>
         <td>
           <p-tag [value]="w.isActive ? 'Activo' : 'Inactivo'" [severity]="getActiveSeverity(w.isActive)"></p-tag>

@@ -92,8 +92,8 @@ export class WarehousesComponent implements OnInit {
     });
   }
 
-  getMainSeverity(isMain: boolean): 'success' | 'secondary' {
-    return isMain ? 'success' : 'secondary';
+  getPrincipalSeverity(isPrincipal: boolean): 'success' | 'secondary' {
+    return isPrincipal ? 'success' : 'secondary';
   }
 
   getActiveSeverity(isActive: boolean): 'success' | 'danger' {

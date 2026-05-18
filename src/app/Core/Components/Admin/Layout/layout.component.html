@@ -10,13 +10,16 @@
       <!-- Logo Section -->
       <div class="logo-section">
         <button class="collapse-btn" (click)="toggleSidebar()">
-          <i class="pi" [class.pi-bars]="!sidebarCollapsed()" [class.pi-bars]="sidebarCollapsed()"></i>
+          <i class="pi pi-bars"></i>
         </button>
         @if (!sidebarCollapsed()) {
           <a routerLink="/admin/dashboard" class="logo-link">
             <img src="/logo.png" alt="d4nthi" class="sidebar-logo" />
           </a>
         }
+        <button class="mobile-close-btn" (click)="closeMobileMenu()">
+          <i class="pi pi-times"></i>
+        </button>
       </div>
 
       <!-- Menu -->
